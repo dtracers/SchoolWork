@@ -1,0 +1,917 @@
+package GUI;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.UnknownHostException;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+
+
+class Menu extends MyButtonPanel implements ActionListener {
+    private static final int PLAYER_BUTTON_WIDTH = 220;
+    private static final int PLAYER_BUTTON_HEIGHT = 220;
+    private static final int BUTTON_HEIGHT = 100;
+    private static final int BUTTON_WIDTH = 300;
+    private static final int FRAME_WIDTH = 1280;
+    private static final int FRAME_HEIGHT = 1024;
+	
+//***** Back button and start button possibly need to be lower **** ///
+//I'll fix that	later when I have a bigger screen
+    private static final int STARTING_BUTTON_lEFT_RIGHT= 425;
+    private static final int STARTING_BUTTON_UP_DOWN = 750;
+    private static final int MENU_BUTTON_WIDTH = 600;
+    private static final int MENU_BUTTON_HEIGHT = 150;
+    private static final int STARTING_HEIGHT = 250;
+    
+    private Image backgroundImage = null;
+    int playerOption = 0;
+    int numberOfPlayers = 0;
+	
+	private JButton startButton;
+	private MyJButton playerButton;
+	private MyJButton computerButton;
+	private MyJButton instructionButton;
+	private MyJButton highScoreButton;
+	private MyJButton girlButton;
+	private MyJButton womanButton;
+	private MyJButton grandmaButton;
+	private MyJButton boyButton;
+	private MyJButton menButton;
+	private MyJButton grandpaButton;
+	private MyJButton backButton;
+	private MyJButton playButton;
+	private MyJButton nextButton;
+	private MyJButton localButton;
+	private MyJButton networkButton;
+	private MyJButton createButton;
+	private MyJButton joinButton;
+	
+	private MyJButton dummyButton;
+	private MyJButton easyButton;
+	private MyJButton moderateButton;
+	private MyJButton perfectButton;
+	
+	private JLabel prompt;
+	private JLabel changePlayer;
+	//Player names fields
+	private JTextField playerName1;
+	private JTextField playerName2;	
+	//Client server fields
+	private JTextField joinNetwork;
+	private JTextField joinNameNetwork;
+	private JTextField createNetwork;
+	private JLabel createNameNetwork;
+	//Specifying game board fields
+	private JTextField numberOfColumns;
+	private JTextField numberOfRows;
+	private JTextField firstOrSecond;
+	private JTextField timeLimit;
+	private JTextField entryRule;
+	
+	private int playerNumber1 = 0; 
+	private int playerNumber2 = 0;
+	
+	private int numberPlayers = 0;
+	
+	String namePlayer1 = "";
+	String namePlayer2 = "";
+	//Specifying network fields
+	int createNetworkNumber;
+	String createNetworkName;
+	int joinNetworkNumber;
+	String joinNetworkName;
+	
+	
+	//Default game specifications
+	int columnNum = 6;
+	int rowNum = 7;
+	String moveFS = "s";
+	int timePerMove = 0;
+	String gameRule = "b";
+	
+	Color coolOrange = new Color(242, 161, 33);
+	Color connectBlue = new Color(0, 128, 255);
+	
+	Image backgroundImageStart = this.loadImage("images/startScreen.png");
+	Image backgroundImageOptions = this.loadImage("images/menu.png");
+	Image backgroundImageInstructions = this.loadImage("images/instructionsScreen.png");
+	Image backgroundImagePlayer1 = this.loadImage("images/player1.png");
+	Image backgroundImagePlayer2 = this.loadImage("images/player2.png");
+	Image backgroundImagePort= this.loadImage("images/portMenu.png");
+	Image backgroundImageSpecifyGame = this.loadImage("images/specifyGame.png");
+	double sX,sY;
+	Font font1 = new Font("SansSerif", Font.PLAIN, 40);
+	
+	public Menu(){
+		this(1,1,FRAME_WIDTH, FRAME_HEIGHT);
+	}	
+	public Rectangle scale(Rectangle r)
+	{
+		return new Rectangle((int)(r.getX()*sX),(int)(r.getY()*sY),(int)(r.getWidth()*sX),(int)(r.getHeight()*sY));
+	}
+	public Menu(double scaleX, double scaleY,int width,int height)
+	{
+		sX=scaleX;
+		sY=scaleY;
+		System.out.println("this far "+width+" h "+height);
+		setSize (width,height);
+		setLayout(null);
+		
+		this.backgroundImage = backgroundImageStart;
+//		this.backgroundImage.getScaledInstance(, Image.SCALE_FAST);
+
+		startButton = new JButton("New Game");
+		startButton.setFont(new Font("Courier", Font.BOLD, 50));
+		startButton.setBackground(coolOrange);
+		startButton.setBounds(400, 750, BUTTON_WIDTH, BUTTON_HEIGHT);
+		//Resize(startButton);
+//		System.out.println("this far");
+		//startButton.resize(sX, sY);
+		add(startButton);
+		startButton.addActionListener(this);
+		
+/*		I made a start button, not neccesary but can be used. I was testing some stuff out.		
+		startButton = new MyJButton("images/newGame.png", 500, 850, BUTTON_WIDTH, BUTTON_HEIGHT);
+		startButton.setAction("optionMenu", this.getClass(),this);
+		startButton.resize(sX, sY);
+		addMyButton(startButton,false);
+	
+		this.addMouseListener(startButton);		
+*/	
+		
+
+//		this.validate();
+	//	this.currentPanel = this;
+//		System.out.println("this far");
+	}
+
+	private Image loadImage (String pad){
+        return Toolkit.getDefaultToolkit().getImage(getClass().getResource(pad));
+    }
+
+	public void optionMenu(){
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;
+		
+		instructionButton = new MyJButton("images/instructions.png",STARTING_HEIGHT, 90, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+		instructionButton.setAction("instructions", this.getClass(),this);
+		addMyButton(instructionButton,false);
+		
+		localButton = new MyJButton("images/localButton.png",STARTING_HEIGHT, 242, MENU_BUTTON_WIDTH, 260);
+		localButton.setAction("playLocal", this.getClass(),this);
+		addMyButton(localButton,false);
+		
+		networkButton = new MyJButton("images/networkButton.png",STARTING_HEIGHT, 504, MENU_BUTTON_WIDTH, 260);
+		networkButton.setAction("playNetwork", this.getClass(),this);
+		addMyButton(networkButton,false);
+			
+		this.addMouseListener(instructionButton);
+		this.addMouseListener(localButton);
+		this.addMouseListener(networkButton);
+		
+		System.out.println("BUTTON!!!");
+		return;
+	}
+	/*
+	public void hideOptionMenu(){
+		this.instructionButton.setVisible(false);
+		this.localButton.setVisible(false);
+		this.networkButton.setVisible(false);
+		this.highScoreButton.setVisible(false);
+	}
+	*/
+	
+	public void playLocal(){
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;
+		
+		playerButton = new MyJButton("images/playerVsPlayer.png",STARTING_HEIGHT, 242, MENU_BUTTON_WIDTH, 260);
+		playerButton.setAction("playerVsPlayer", this.getClass(),this);
+		addMyButton(playerButton,false);
+		
+		computerButton = new MyJButton("images/playerVsComputer.png",STARTING_HEIGHT, 504, MENU_BUTTON_WIDTH, 260);
+		computerButton.setAction("playerVsComputer", this.getClass(),this);
+		addMyButton(computerButton,false);
+		
+		this.addMouseListener(playerButton);
+		this.addMouseListener(computerButton);
+	}
+	
+	public void playNetwork(){
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImagePort;
+		//For now, let's just start the game. I'll deal with making it so that the player chooses their player & name 
+		numberOfPlayers = 2;
+		
+		createButton = new MyJButton("images/createPort.png",175, 700, 249, 100);
+		createButton.setAction("specifyGame", this.getClass(),this);
+		addMyButton(createButton,false);
+		
+		createNameNetwork = new JLabel();
+		createNameNetwork.setFont(new Font("Courier", Font.BOLD, 20));
+		createNameNetwork.setBounds(120,475, 600, 50);
+		
+		createNetwork = new JTextField();
+		createNetwork.setColumns(25);
+		createNetwork.setBounds(140,625, 300, 50);
+		createNetwork.setFont(font1);
+				
+		try {
+			java.net.InetAddress addr;
+			addr = java.net.InetAddress.getLocalHost();
+		    String hostname = addr.getHostName();     
+		    System.out.println("Hostname of system = " + hostname); 
+		    createNameNetwork.setText("Hostname of system = " + hostname);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}     
+		
+		joinButton = new MyJButton("images/joinPort.png",850, 700, 249, 100);
+		joinButton.setAction("client", this.getClass(),this);
+		addMyButton(joinButton,false);
+		
+		joinNetwork = new JTextField();
+		joinNetwork.setColumns(25);
+		joinNetwork.setBounds(830,475, 300, 50);
+		joinNetwork.setFont(font1);
+		
+		joinNameNetwork = new JTextField();
+		joinNameNetwork.setColumns(25);
+		joinNameNetwork.setBounds(830,625, 300, 50);
+		joinNameNetwork.setFont(font1);
+		
+		add(createNetwork);
+		add(createNameNetwork);
+		add(joinNetwork);
+		add(joinNameNetwork);
+		this.addMouseListener(createButton);
+		this.addMouseListener(joinButton);
+	}
+	
+	public void specifyGame(){
+		this.removeAll();
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageSpecifyGame;
+		
+		numberOfColumns = new JTextField();
+		numberOfColumns.setColumns(25);
+		numberOfColumns.setBounds(300,240, 300, 50);
+		numberOfColumns.setFont(font1);
+		
+		numberOfRows = new JTextField();
+		numberOfRows.setColumns(25);
+		numberOfRows.setBounds(300,350, 300, 50);
+		numberOfRows.setFont(font1);
+		
+		firstOrSecond = new JTextField();
+		firstOrSecond.setColumns(25);
+		firstOrSecond.setBounds(300,450, 300, 50);
+		firstOrSecond.setFont(font1);
+		
+		timeLimit = new JTextField();
+		timeLimit.setColumns(25);
+		timeLimit.setBounds(300,550, 300, 50);
+		timeLimit.setFont(font1);
+		
+		entryRule = new JTextField();
+		entryRule.setColumns(25);
+		entryRule.setBounds(300,800, 300, 50);
+		entryRule.setFont(font1);
+		
+		joinButton = new MyJButton("images/play.png",950, 870, 300, 100);
+		joinButton.setAction("server", this.getClass(),this);
+		joinButton.resize(sX, sY);
+		addMyButton(joinButton,false);
+		
+		add(numberOfColumns);
+		add(numberOfRows);
+		add(firstOrSecond);
+		add(timeLimit);
+		add(entryRule);
+		this.addMouseListener(joinButton);
+		
+		setNetworkInformation();
+	}
+	
+	public void server(){
+		//create a server here or call
+		//Main.server.java
+		
+		//I don't know if I'm right, but I'm creating a server here.
+		main.server s = new main.server(createNetworkNumber, columnNum, rowNum, moveFS, timePerMove, gameRule);	//creates the board with specified data
+		
+	}
+	
+	public void client(){
+		//connect to a server
+		//or call Main.connection.java
+		
+		// I don't know if I'm right? 
+		main.connection r = new main.connection(createNetworkName, createNetworkNumber);
+		r.setConnection(columnNum, rowNum, moveFS, timePerMove, gameRule);	//creates the board with specified data
+		
+	}
+	
+	public void setNetworkInformation(){
+		createNetworkNumber = Integer.parseInt(createNetwork.getText());;
+		createNetworkName = createNameNetwork.getText();
+		joinNetworkNumber = Integer.parseInt(joinNetwork.getText());;
+		joinNetworkName = joinNameNetwork.getText();
+	}
+	
+	public int setCreateNumber(){
+		int setCreateNumber = createNetworkNumber;
+		return setCreateNumber;
+	}
+	
+	public String setCreateName(){
+		String setCreateName = createNetworkName;
+		return setCreateName;
+	}
+	
+	public int setJoinNumber(){
+		int setJoinNumber = joinNetworkNumber;
+		return setJoinNumber;
+	}
+	
+	public String setJoinName(){
+		String setJoinName = joinNetworkName;
+		return setJoinName;
+	}
+	
+	public void setGameBoardInformation(){
+		//Set player names
+		namePlayer1 = playerName1.getText();
+		System.out.println(namePlayer1);
+		namePlayer2 = playerName2.getText();
+		System.out.println(namePlayer2);
+		//Set board information
+		columnNum = Integer.parseInt(numberOfColumns.getText());
+		rowNum = Integer.parseInt(numberOfRows.getText());
+		moveFS = firstOrSecond.getText();
+		timePerMove = Integer.parseInt(timeLimit.getText());
+		gameRule = entryRule.getText();
+	}
+	
+	public int setColumns(){
+		int setColumns = columnNum;
+		return setColumns;
+	}
+	
+	public int setRows(){
+		int setRows = rowNum;
+		return setRows;
+	}
+	
+	public String setMove(){
+		String setMove = moveFS;
+		return setMove;
+	}
+	
+	public int setTime(){
+		int setTime = timePerMove;
+		return setTime;
+	}
+	
+	public String setRule(){
+		String setRule = gameRule;
+		return setRule;
+	}
+	
+	//This isn't starting the game
+	public void startGame(){
+		//setGameBoardInformation();
+		this.removeAllButtons();
+		this.removeAll();
+		MainFrame.thisFrame.start();
+	}
+	
+	public void playerVsComputer(){
+		numberOfPlayers = 1;
+		playerOption1();
+		//return numberOfPlayers;
+	}
+	
+	public void playerVsPlayer(){
+		numberOfPlayers = 2;
+		playerOption1();
+		//return numberOfPlayers;
+	}
+	
+	public int setPlayerValues(){
+		if(numberOfPlayers == 1){
+			numberPlayers = 1;
+		}
+		else if (numberOfPlayers ==2){
+			numberPlayers = 2;
+		}
+		return numberOfPlayers;
+	}
+	
+	public void playerOption1(){
+//Background image is called "player1.png" 
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImagePlayer1;		
+		
+		girlButton = new MyJButton("images/childGirl.png", 200, 275, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		girlButton.setAction("player1Number1", this.getClass(),this);
+		addMyButton(girlButton,false);
+		
+		womanButton = new MyJButton("images/adultGirl.png", 420,275, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		womanButton.setAction("player1Number2", this.getClass(),this);
+		addMyButton(womanButton,false);
+		
+		grandmaButton = new MyJButton("images/grandmaGirl.png", 640,275, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandmaButton.setAction("player1Number3", this.getClass(),this);
+		addMyButton(grandmaButton,false);
+		
+		boyButton = new MyJButton("images/childBoy.png", 200,495, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		boyButton.setAction("player1Number4", this.getClass(),this);
+		addMyButton(boyButton,false);
+		
+		menButton = new MyJButton("images/adultBoy.png", 420,495, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		menButton.setAction("player1Number5", this.getClass(),this);
+		addMyButton(menButton,false);
+
+		grandpaButton = new MyJButton("images/grandpaBoy.png", 640,495, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandpaButton.setAction("player1Number6", this.getClass(),this);
+		addMyButton(grandpaButton,false);	
+		
+		this.addMouseListener(girlButton);
+		this.addMouseListener(womanButton);
+		this.addMouseListener(grandmaButton);
+		this.addMouseListener(boyButton);
+		this.addMouseListener(menButton);
+		this.addMouseListener(grandpaButton);
+
+		return;
+	}
+	
+	public void player1Number1(){
+		playerOption = 1;
+		player1();
+	}
+	
+	public void player1Number2(){
+		playerOption = 2;
+		player1();
+	}
+	
+	public void player1Number3(){
+		playerOption = 3;
+		player1();
+	}
+	
+	public void player1Number4(){
+		playerOption = 4;
+		player1();
+	}
+	
+	public void player1Number5(){
+		playerOption = 5;
+		player1();
+	}
+	
+	public void player1Number6(){
+		playerOption = 6;
+		player1();
+	}
+	
+	public void playerOption2(){
+//Background image is called "player2.png"
+		this.removeAllButtons();
+		this.removeAll();
+		this.backgroundImage = backgroundImagePlayer2;		
+		
+		girlButton = new MyJButton("images/childGirl.png", 200, 275, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		girlButton.setAction("player2Number1", this.getClass(),this);
+		addMyButton(girlButton,false);
+		
+		womanButton = new MyJButton("images/adultGirl.png", 420,275, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		womanButton.setAction("player2Number2", this.getClass(),this);
+		addMyButton(womanButton,false);
+		
+		grandmaButton = new MyJButton("images/grandmaGirl.png", 640,275, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandmaButton.setAction("player2Number3", this.getClass(),this);
+		addMyButton(grandmaButton,false);
+		
+		boyButton = new MyJButton("images/childBoy.png", 200,495, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		boyButton.setAction("player2Number4", this.getClass(),this);
+		addMyButton(boyButton,false);
+		
+		menButton = new MyJButton("images/adultBoy.png", 420,495, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		menButton.setAction("player2Number5", this.getClass(),this);
+		addMyButton(menButton,false);
+
+		grandpaButton = new MyJButton("images/grandpaBoy.png", 640,495, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandpaButton.setAction("player2Number6", this.getClass(),this);
+		addMyButton(grandpaButton,false);	
+		
+		this.addMouseListener(girlButton);
+		this.addMouseListener(womanButton);
+		this.addMouseListener(grandmaButton);
+		this.addMouseListener(boyButton);
+		this.addMouseListener(menButton);
+		this.addMouseListener(grandpaButton);
+
+		return;
+	}
+	
+	public void player2Number1(){
+		playerOption = 1;
+		player2();
+	}
+	
+	public void player2Number2(){
+		playerOption = 2;
+		player2();
+	}
+	
+	public void player2Number3(){
+		playerOption = 3;
+		player2();
+	}
+	
+	public void player2Number4(){
+		playerOption = 4;
+		player2();
+	}
+	
+	public void player2Number5(){
+		playerOption = 5;
+		player2();
+	}
+	
+	public void player2Number6(){
+		playerOption = 6;
+		player2();
+	}
+	
+	public void instructions(){
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageInstructions;		
+		
+		backButton = new MyJButton("images/back.png",
+				STARTING_BUTTON_lEFT_RIGHT, STARTING_BUTTON_UP_DOWN, BUTTON_WIDTH, BUTTON_HEIGHT);//copied from set bounds
+		//backButton.resize(sX, sY);
+		addMyButton(backButton,false);
+		backButton.setAction("optionMenu", this.getClass(), this);
+		
+		this.addMouseListener(backButton);
+		
+		return;
+	}
+	
+	public void player1(){
+// Background image is called "menu.png"
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;
+		Font font1 = new Font("SansSerif", Font.PLAIN, 40);
+		
+		System.out.println(numberOfPlayers);
+
+		//This will decide on depending on which player they chose, it will save it
+		if(playerOption == 1){	
+			playerNumber1 = 1;
+			//image is called "childGirl.png"
+			girlButton = new MyJButton("images/childGirl.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			girlButton.setAction("playerOption1", this.getClass(),this);
+			addMyButton(girlButton,false);	
+			this.addMouseListener(girlButton);
+		}
+		else if (playerOption == 2){
+			//image is called "adultGirl.png"
+			playerNumber1 = 2;
+			womanButton = new MyJButton("images/adultGirl.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			womanButton.setAction("playerOption1", this.getClass(),this);
+			addMyButton(womanButton,false);	
+			this.addMouseListener(womanButton);		
+		}
+		else if (playerOption == 3){
+			playerNumber1 = 3;
+			//image is called "grandmaGirl.png"
+			grandmaButton = new MyJButton("images/grandmaGirl.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			grandmaButton.setAction("playerOption1", this.getClass(),this);
+			addMyButton(grandmaButton,false);	
+			this.addMouseListener(grandmaButton);	
+		}
+		else if (playerOption == 4){	
+			playerNumber1 = 4;
+			//image is called "childBoy.png"
+			boyButton = new MyJButton("images/childBoy.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			boyButton.setAction("playerOption1", this.getClass(),this);
+			addMyButton(boyButton,false);	
+			this.addMouseListener(boyButton);	
+		}
+		else if (playerOption == 5){	
+			playerNumber1 = 5;
+			//image is called "adultBoy.png"
+			menButton = new MyJButton("images/adultBoy.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			menButton.setAction("playerOption1", this.getClass(),this);
+			addMyButton(menButton,false);	
+			this.addMouseListener(menButton);	
+		}
+		else if (playerOption == 6){
+			playerNumber1 = 6;
+			//image is called "grandpaBoy.png"
+			grandpaButton = new MyJButton("images/grandpaBoy.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			grandpaButton.setAction("playerOption1", this.getClass(),this);
+			addMyButton(grandpaButton,false);	
+			this.addMouseListener(grandpaButton);
+		}
+		
+		changePlayer = new JLabel();
+		changePlayer.setText("To change your player, click on it");
+		changePlayer.setFont(new Font("Courier", Font.ITALIC, 18));
+		changePlayer.setBounds(400,85, 400, 200);
+		
+	    prompt = new JLabel();
+	    prompt.setText("Please enter Player 1's name.\n");
+	    prompt.setFont(new Font("Courier", Font.BOLD, 20));
+	    prompt.setBounds(400,350, 400, 200);
+
+		playerName1 = new JTextField();
+		playerName1.setColumns(25);
+	    playerName1.setBounds(420,480, 300, 50);
+	    playerName1.setFont(font1);
+
+	    add(prompt);
+		add(playerName1);
+		add(changePlayer);
+		
+	    playerName1.addActionListener(this);
+
+	   System.out.println(numberOfPlayers);
+	    if(numberOfPlayers == 1){
+	    	playButton = new MyJButton("images/play.png", STARTING_BUTTON_lEFT_RIGHT, 580, BUTTON_WIDTH, BUTTON_HEIGHT);
+	    	playButton.setAction("startGame", this.getClass(),this);
+	    	addMyButton(playButton,false);
+			this.addMouseListener(playButton);
+			//return null;
+	    }
+	    //If they choose to play against another player then a next button appears
+	    else if(numberOfPlayers == 2) {
+	    	nextButton = new MyJButton("images/next.png", STARTING_BUTTON_lEFT_RIGHT, 580, BUTTON_WIDTH, BUTTON_HEIGHT);
+	    	nextButton.setAction("playerOption2", this.getClass(),this);
+	    	addMyButton(nextButton,false);
+			this.addMouseListener(nextButton);
+	    }
+	    
+	    setVisible(true);
+	    return;
+	}
+
+	
+	public void player2(){		
+// Background image is called "menu.png"	
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;		
+		Font font1 = new Font("SansSerif", Font.PLAIN, 40);
+		
+		//This will decide on depending on which player they chose, it will save it
+		if(playerOption == 1){	
+			playerNumber2 = 1;
+			//image is called "childGirl.png"
+			girlButton = new MyJButton("images/childGirl.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			girlButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(girlButton,false);	
+			this.addMouseListener(girlButton);
+		}
+		else if (playerOption == 2){
+			//image is called "adultGirl.png"
+			playerNumber2 = 2;
+			womanButton = new MyJButton("images/adultGirl.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			womanButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(womanButton,false);	
+			this.addMouseListener(womanButton);	
+		}
+		else if (playerOption == 3){
+			//image is called "grandmaGirl.png"
+			playerNumber2 = 3;
+			grandmaButton = new MyJButton("images/grandmaGirl.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			grandmaButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(grandmaButton,false);	
+			this.addMouseListener(grandmaButton);	
+		}
+		else if (playerOption == 4){	
+			//image is called "childBoy.png"
+			playerNumber2 = 4;
+			boyButton = new MyJButton("images/childBoy.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			boyButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(boyButton,false);	
+			this.addMouseListener(boyButton);	
+		}
+		else if (playerOption == 5){	
+			//image is called "adultBoy.png"
+			playerNumber2 = 5;
+			menButton = new MyJButton("images/adultBoy.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			menButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(menButton,false);	
+			this.addMouseListener(menButton);
+		}
+		else if (playerOption == 6){
+			//image is called "grandpaBoy.png"
+			playerNumber2 = 6;
+			grandpaButton = new MyJButton("images/grandpaBoy.png", 450, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			grandpaButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(grandpaButton,false);	
+			this.addMouseListener(grandpaButton);
+		}
+		
+		changePlayer = new JLabel();
+		changePlayer.setText("To change your player, click on it");
+		changePlayer.setFont(new Font("Courier", Font.ITALIC, 18));
+		changePlayer.setBounds(400,85, 400, 200);
+
+	    playerName2 = new JTextField();
+	    playerName2.setColumns(25);
+	    playerName2.setBounds(400,480, 300, 50);
+	    playerName2.setFont(font1);
+	    
+	    prompt = new JLabel();
+	    prompt.setText("Please enter Player 2's name.\n");
+	    prompt.setFont(new Font("Courier", Font.BOLD, 20));
+	    prompt.setBounds(420,350, 400, 200);
+	   
+    	playButton = new MyJButton("images/play.png", STARTING_BUTTON_lEFT_RIGHT, 580, BUTTON_WIDTH, BUTTON_HEIGHT);
+    	playButton.setAction("startGame", this.getClass(),this);
+    	addMyButton(playButton,false);
+	    
+		add(changePlayer);
+	    add(prompt);
+	    add(playerName2);
+	    setVisible(true);
+	        
+	    this.addMouseListener(playButton);
+	    playerName2.addActionListener(this);
+
+	}
+	
+	public int getValues1(){
+		if(playerNumber1 == 1){
+			playerOption = 1;
+		}
+		else if(playerNumber1 == 2){
+			playerOption = 2;
+		}
+		else if(playerNumber1 == 3){
+			playerOption = 3;
+		}
+		else if(playerNumber1 == 4){
+			playerOption = 4;
+		}
+		else if(playerNumber1 == 5){
+			playerOption = 5;
+		}
+		else if(playerNumber1 == 6){
+			playerOption = 6;
+		}
+		
+		return playerOption;
+	}
+	
+	public int getValues2(){
+		if(playerNumber2 == 1){
+			playerOption = 1;
+		}
+		else if(playerNumber2 == 2){
+			playerOption = 2;
+		}
+		else if(playerNumber2 == 3){
+			playerOption = 3;
+		}
+		else if(playerNumber2 == 4){
+			playerOption = 4;
+		}
+		else if(playerNumber2 == 5){
+			playerOption = 5;
+		}
+		else if(playerNumber2 == 6){
+			playerOption = 6;
+		}
+		
+		return playerOption;
+	}
+/*	
+	public void selectLevel(){
+// Background image is called "selectLevel.png" 	
+		this.removeAllButtons();
+		this.removeAll();
+		this.backgroundImage = backgroundImageSelectLevel;		
+		if(numberOfPlayers==2)
+		{
+			MainFrame.thisFrame.start();
+			return;
+		}
+		//image is called "dummy.png" 
+		dummyButton = new MyJButton("images/dummy.png", 321,250, 600, 150);
+		dummyButton.setAction("dummy", this.getClass(),this);
+		//Resize(dummyButton);
+		addMyButton(dummyButton,false);
+		this.addMouseListener(dummyButton);//IMPORTANT
+		
+		easyButton = new MyJButton("images/easy.png", 321,400, 600, 150);
+		easyButton.setAction("easy", this.getClass(),this);
+		//Resize(easyButton);
+		addMyButton(easyButton,false);
+		this.addMouseListener(easyButton);//IMPORTANT
+		
+		moderateButton = new MyJButton("images/moderate.png", 321,550, 600, 150);
+		moderateButton.setAction("moderate", this.getClass(),this);
+		//Resize(moderateButton);
+		addMyButton(moderateButton,false);
+		this.addMouseListener(moderateButton);//IMPORTANT
+		
+		perfectButton = new MyJButton("images/perfect.png", 321,700, 600, 150);
+		perfectButton.setAction("perfect", this.getClass(),this);
+		//Resize(perfectButton);
+		addMyButton(perfectButton,false);
+		this.addMouseListener(perfectButton);//IMPORTANT
+		
+		return;
+	}
+*/	
+	public String getName1(){
+		String newName = namePlayer1;
+		return newName;
+	}
+	
+	
+	public String getName2(){
+		String newName = namePlayer2;
+		return newName;
+	}
+
+//functions below is for when we decide on making the level difficulties
+/*	
+	public void dummy(){
+		//removeAll();
+		//MainFrame.thisFrame.sideMenu();
+		MainFrame.thisFrame.start();
+		
+	}
+
+	public void easy(){
+		MainFrame.thisFrame.start();
+	}
+
+	
+	public void moderate(){
+		MainFrame.thisFrame.start();
+	}
+	
+	public void perfect(){
+		MainFrame.thisFrame.start();
+	}
+*/	
+
+	// Don't need the function below
+	public void actionPerformed(ActionEvent event){
+	//actions for button
+		String command=event.getActionCommand();
+			if(command.equals("New Game")){ 
+				System.out.println("new game!!");
+				//Display option screen
+				this.remove(startButton);
+				optionMenu();
+			}
+	}
+	public void paint(Graphics g)
+	{
+		//paints all the backgrounds
+		if(backgroundImage != null)
+		{
+	//		System.out.println("scaling"+(int)(1280.*sX)+" "+(int)(1040.*sY));
+	//		System.out.println(backgroundImage);
+			g.drawImage(backgroundImage, 0, 0,(int)(1280.*sX),(int)(1024.*sY),null);
+		}else
+		{
+		//	System.out.println("Not scaling");
+		}
+
+		//foreground below
+		
+		super.paint(g);
+		super.paintComponents(g);
+	}
+	
+	public void Resize(JComponent j)
+	{
+		j.setBounds(scale(j.getBounds()));
+	}
+	
+}
+
+
+

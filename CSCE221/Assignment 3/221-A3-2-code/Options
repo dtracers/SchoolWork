@@ -1,0 +1,19 @@
+#options are in format of
+#option number
+#option description
+1
+Key: Assign [name of variable] [equation or value]
+This will assign an equation or value to a variable
+2
+Key: [equation]
+This will create a nameless equation you can only create one of these
+3
+Key: List
+This will list all the options
+4
+Key: Evaluate [name of variable]
+This will evaluate the given expression assigned to that name.
+If a name is not given it pop an equation of the stack and evaluate it.
+5
+Key: Quit
+This will quit the application

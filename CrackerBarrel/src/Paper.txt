@@ -1,0 +1,54 @@
+#1
+The basic solution that is used is a breadth first algorithm.  It then adds a number of speedups.  It uses a hash map to hold each state to make sure that states are unique.  after that speedup I added a rotation aspect where it will rotate each state to make sure that it is unique with respect to rotation too.  After it does that it actually finds a lot less moves and is a lot quicker too.  Also it will store the moves of the solutions into a reverse tree.
+
+#2  
+6 Triangle
+Starting
+  0
+ 1 1
+1 1 1
+Final
+  1
+ 0 0
+0 0 0
+Solutions in 6 Triangle solutions.txt
+
+10 Triangle
+Starting
+   0
+  1 1
+ 1 1 1
+1 1 1 1
+Final
+   1
+  0 0
+ 0 0 0
+0 0 0 0
+Solutions in 10 Triangle solutions.txt
+
+15 Triangle
+Starting
+    0
+   1 1
+  1 1 1
+ 1 1 1 1
+1 1 1 1 1
+Final
+    1
+   0 0
+  0 0 0
+ 0 0 0 0
+0 0 0 0 0
+Solutions in 15 Triangle solutions.txt
+
+#3 The times are with each respective triangle txt file.
+I ran it on a 2010 macbook pro 2.4GHz i5, with 8GB of ram
+
+#4
+It is possible to solve it with most configurations.  for example It is not solvable with the hole in the first and the last configuration. but it is solvable with other configurations.
+
+#5
+There are 0 distinct solution sequences
+
+#6
+There are 0 distinct final solutions.

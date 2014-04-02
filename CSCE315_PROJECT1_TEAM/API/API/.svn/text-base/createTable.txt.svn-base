@@ -1,0 +1,21 @@
+CREATE TABLE customer
+(First_Name char(50),
+Last_Name char(50),
+Address char(50),
+City char(50),
+Country char(25),
+Birth_Date date,
+PRIMARY KEY First_Name);
+
+CREATE TABLE another_table
+(FIrst_COLUMN string(50),
+columnNumber int,
+Creation_day date,
+Creation_time time,
+PRIMARY KEY columnNumber,
+PRIMARY KEY First_COLUMN);
+
+
+
+INSERT INTO another_table (FIrst_COLUMN, columnNumber, Creation_day, Creation_time)
+(first_data,50,[10:20:2010],[20:12:20])

@@ -1,0 +1,25 @@
+SELECT *
+FROM Book
+WHERE price > 100.00
+ORDER BY title;
+
+SELECT Book.title,
+COUNT(*) AS Authors
+FROM  Book JOIN Book_author
+ON Book.isbn = Book_author.isbn
+GROUP BY Book.title;
+    
+    
+SELECT title,
+COUNT(*) AS Authors
+FROM  Book NATURAL JOIN Book_author
+GROUP BY title; 
+    
+SELECT isbn,
+title,
+price,
+price * 0.06 AS sales_tax
+FROM Book
+WHERE price > 100.00
+ORDER BY title
+STORE table_name;

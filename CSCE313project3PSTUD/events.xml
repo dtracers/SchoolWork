@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<events>
+	<event>
+		<name>Practice</name>
+		<date>05/12/2012</date>
+		<location>1111 University Dr. College Station, TX</location>
+	</event>
+	<event>
+		<name>Recoding</name>
+		<date>06/25/2012</date>
+		<location>2222 University Dr. College Station, TX</location>
+	</event>
+ </events>

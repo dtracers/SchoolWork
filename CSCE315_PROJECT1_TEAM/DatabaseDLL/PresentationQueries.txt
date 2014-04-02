@@ -1,0 +1,231 @@
+int result;
+string queryString;
+string queryResult;
+
+//Creating Tables
+result = db->create("CREATE TABLE Artist (ArtistID int, Name varchar(50), FamousDate Date, FamousTime Time, Age int);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->create("CREATE TABLE Song (SongID int, Name varchar(75), Float Price, ArtistID int, ReleaseDate Date);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->create("CREATE TABLE TopHits (SongID int, ArtistID int, Rating int);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->create("CREATE TABLE TempTable (Blah int, Blee float, Bloo Date);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->create("CREATE TABLE CompareTable (SongID int);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+//Inserting into the tables
+cout << "Arist Table Row Count: " << db->recordCount("Artist") << endl;
+result = db->insert("INSERT INTO Artist (ArtistID, Name, FamousDate, FamousTime, Age) VALUES (10, Britney Spears, [1990/01/10], [23:45:10], 26);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Artist (ArtistID, Name, FamousDate, FamousTime, Age) VALUES (15, Rihanna, [2001/10/09], [12:46:38], 30);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Artist (ArtistID, Name, FamousDate, FamousTime, Age) VALUES (12, Enrique Englias, [2011/05/12], [14:20:10], 27);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Artist (ArtistID, Name, FamousDate, FamousTime, Age) VALUES (4, Taylor Swift, [2005/12/25], [09:09:09], 22);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+cout << "Arist Table Row Count: " << db->recordCount("Artist") << endl;
+//
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (100, Till The World Ends, 0.99, 10, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (101, Criminal, 0.95, 10, [2005/07/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (102, Baby, 1.99, 10, [1995/07/20]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (103, Circus, 2.99, 10, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (200, Wrong Song, 0.99, 15, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (201, Distrubia, 0.95, 15, [2005/07/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (202, Love The Way You Lie, 1.99, 15, [1995/07/20]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (203, Only Girl, 2.99, 15, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (300, Tonight, 0.99, 12, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (301, I Like It, 0.95, 12, [2005/07/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (302, Hero, 1.99, 12, [1995/07/20]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (303, Dirty Dancer, 2.99, 12, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (400, Love Story, 0.99, 4, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (401, You Belong With Me, 0.95, 4, [2005/07/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (402, Mine, 1.99, 4, [1995/07/20]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO Song (SongID, Name, Price, ArtistID, ReleaseDate) VALUES (403, The Story Of US, 2.99, 4, [2005/03/15]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+result = db->insert("INSERT INTO TopHits (SongID, ArtistID, Rating) VALUES (100, 10);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO TopHits (SongID, ArtistID, Rating) VALUES (300, 12);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+result = db->insert("INSERT INTO TempTable (Blah, Blee, Bloo) VALUES (10, 10.10, [2010/10/10]);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+result = db->insert("INSERT INTO CompareTable (SongID) VALUES (303);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+result = db->insert("INSERT INTO CompareTable (SongID) VALUES (103);");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+//
+//Updating a song name
+cout << db->list("Song") << endl;
+result = db->update("UPDATE TABLE Song SET (Name) VALUES (We Found Love) WHERE SongID = 200;");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+cout << db->list("Song") << endl;
+result = db->update("UPDATE TABLE Artist SET (FamousTime) VALUES ([10:30:30]) WHERE ArtistID = 10;");
+if(result != 0) {
+	cout << Error: " << result << " Message: " << db->getErrorMessage() << endl;
+}
+
+//
+//Delete a row
+cout << db->list("TempTable") << endl;
+db->deleteRows("DELETE FROM TempTable WHERE Blah = 10");
+cout << db->list("TempTable") << endl;
+//
+//Delete a table
+cout << "TempTable Record Count: " << db->recordCount("TempTable") << endl;
+db->drop("TempTable");
+cout << "Returns error meaning TempTable doesn't exist: " << db->recordCount("TempTable") << endl;
+//
+//Queries!!!!
+queryString = "SELECT Sum("Price") AS TotalPrice, Min("ReleaseDate") As FirstRelease, Max("ReleaseDate") AS LastRelease, Count("SongID") AS TotalSongs FROM Songs WHERE SongID >= 100 STORE QueryResult;";
+try {
+	cout << "Query Operations Result:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT * FROM Songs WHERE Price >= 1.00 STORE QueryResultTwo;";
+try {
+	cout << "SELECT * Result:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Artist.Name FROM Artist, TopHits WHERE Arist.ArtistID = TopHits.ArtistID STORE QueryResultThree;";
+try {
+	cout << "Multitable, Artists with Top Hits:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE Price > 1.00 AND Price < 2.00 STORE QueryResultFour;";
+try {
+	cout << "AND Operator:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE Price > 1.00 OR Price < 2.00 STORE QueryResultFive;";
+try {
+	cout << "OR Operator:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE NOT (Price < 2.00 STORE) QueryResultSix;";
+try {
+	cout << "NOT Operator:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE SongID >=ANY CompareTable STORE QueryResultSeven;";
+try {
+	cout << "ANY:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE SongID >=ALL CompareTable STORE QueryResultEight;";
+try {
+	cout << "ALL:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE SongID IN CompareTable STORE QueryResultNine;";
+try {
+	cout << "IN:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}
+queryString = "SELECT Name FROM Song WHERE EXISTS CompareTable STORE QueryResultTen;";
+try {
+	cout << "EXISTS:" << endl << db.query(queryString) << endl;
+}
+catch(DatabaseException& e) {
+	cout << "Query Error: " << e.getErrorMessage() << " on the following query:" << endl << queryString << endl;
+}

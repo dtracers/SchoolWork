@@ -1,0 +1,575 @@
+
+#include "Database.h"
+#include "parser.h"
+#include "global_parsing_methods.h"
+#include "OPERATIONS.cpp"
+
+Database::Database()
+{
+	dbParser = new parser(this);
+}
+Database::~Database()
+{
+	delete dbParser;
+}
+//Query to create a table
+int Database::create(string input) {
+
+	dbParser->parse(input);
+	return 0;
+}
+
+void Database::setErrorMessage(string msg) {
+	errorMessage = msg;
+}
+
+
+//Deletes rows according to the input string
+int Database::deleteRows(string input) {
+	
+	
+	//dbParser->parse(input);
+
+	return 0;
+}
+	
+//Drops a whole table! yikes.
+int Database::drop(string tableName) {
+	
+	if(findTable(tableName) == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+	map<string, Table*>::iterator it = tableList.find(tableName);
+	tableList.erase(it);
+
+	return 0;
+}
+	
+//Gets the last error that occured
+string Database::getErrorMessage() {
+	return errorMessage;
+}
+
+//Inserts rows into a table
+int Database::insert(string input) {
+	
+	dbParser->parse(input);
+
+	return 0;
+}
+	
+string Database::list(string tableName) {
+	string result = printTable(tableName);
+	return result;
+}
+
+//Queries a table, saves results, and returns results
+string Database::query(string input) {
+	
+	dbParser->parse(input);
+
+	string tableName = dbParser->return_last_table();
+
+	return printTable(tableName);
+}
+
+//Returns tuple count of table or entire database
+int Database::recordCount(string tableName) {
+	//If no table specified, get entire table tuple count
+	if(tableName.size() == 0) {
+		int totalRecords = 0;
+	
+		map<string,Table*>::iterator it;
+		for ( it=tableList.begin() ; it != tableList.end(); it++ ) {
+			totalRecords += countRecordsByTable(it->first);
+		}
+	
+		return totalRecords;
+	}
+	else {
+		return countRecordsByTable(tableName);
+	}
+}
+	
+//Updates a column or entire row of a table
+int Database::update(string input) {
+	
+	dbParser->parse(input);
+	return 0;
+}
+
+/*
+	Functions used internally but need to be public
+*/
+
+//Gets the table
+Table* Database::findTable(string tableName) {
+	return tableList[tableName];
+}
+
+Column* Database::findColumn(string totalName)
+{
+	vector<string> fullName=globalParse::get_separate_statments(totalName,".");
+	return findTable(fullName[0])->findColumn(fullName[1]);
+}
+//Add a row to a table given the table name, the column names, and the data for the rows
+void Database::addRowToTable(string tableName, vector<string> columnNames, vector<string> rowData) {
+
+	if(columnNames.size() != rowData.size()) {
+		throw DatabaseException(12);
+	}
+
+	Table *theTable = findTable(tableName);
+	
+	if(theTable == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+	theTable->addRow(columnNames, rowData);
+}
+
+//Finds the table and returns the rowCount
+int Database::countRecordsByTable(string tableName){
+	if(findTable(tableName) == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+	return tableList[tableName]->rowCount();
+}
+	
+//Create an empty table
+void Database::createTable(string tableName) {
+	if(findTable(tableName) != NULL) {
+		throw DatabaseException(11, tableName + " already exist.");
+	}
+
+	tableList[tableName] = new Table(tableName);
+}
+
+//Print a single table given the name
+string Database::printTable(string tableName){
+	string s = "";
+	Table* table = findTable(tableName);
+	if(table == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+	s = table->printSelf();
+	return s;
+}
+
+//Goes through the columns to check if that column should be returned
+void Database::queryParsing(Query_parser* parser) {
+	string oldTableName=parser->tables[0];
+	vector<LogicExpression::ExpressionTree*> expTree=parser->trees;
+	string newTableName=parser->new_table_name;
+	map<string,string> oldToNewColumns=parser->new_columns;
+	Table *oldTable = findTable(oldTableName);
+	Table *newTable = findTable(newTableName);
+
+	//Make sure the tables exist
+	if(oldTable == NULL) {
+		throw DatabaseException(10, oldTableName + " does not exist.");
+	} else if(newTable == NULL) {
+		throw DatabaseException(10, newTableName + " does not exist.");
+	}
+	int selectFuncsExist = parser->selectFunctionsExist();
+
+	if(selectFuncsExist == -1) {
+		throw DatabaseException(25, "SELECT commands must all be select functions (Sum, Count, Min, or Max).");
+	}
+
+	vector<string> oldTableColumnNames = oldTable->columnNames();
+
+	if(selectFuncsExist == 0) {
+		normalQuery(parser);
+	}
+	else {
+
+		map<string, string>::iterator oldToNewColumnsIt;
+		vector<string> columnNamesToAdd;
+		vector<string> columnDataToAdd;
+
+		for(oldToNewColumnsIt = oldToNewColumns.begin(); oldToNewColumnsIt != oldToNewColumns.end(); oldToNewColumnsIt++) {
+			string oldName = oldToNewColumnsIt->first;
+			string newName = oldToNewColumnsIt->second;
+
+
+			columnNamesToAdd.push_back(newName);
+			string str = "";
+			stringstream strstr;
+
+			if(oldName.find("SUM") != string::npos) {
+				strstr << sumStatement(parser, parser->selectFunctionRemove(oldName));
+			}
+			else if(oldName.find("COUNT") != string::npos) {
+				strstr << countStatement(parser);
+			}
+			else if(oldName.find("MIN") != string::npos) {
+				strstr << minMaxStatement(parser, parser->selectFunctionRemove(oldName), true);
+			}
+			else if(oldName.find("MAX") != string::npos) {
+				strstr << minMaxStatement(parser, parser->selectFunctionRemove(oldName), false);
+			}
+
+			strstr >> str;
+
+			columnDataToAdd.push_back(str);
+		}
+	}
+}
+void Database::normalQuery(Query_parser* parser)
+{
+	string oldTableName=parser->tables[0];
+	vector<LogicExpression::ExpressionTree*> expTree=parser->trees;
+	string newTableName=parser->new_table_name;
+	map<string,string> oldToNewColumns=parser->new_columns;
+	Table *oldTable = findTable(oldTableName);
+	Table *newTable = findTable(newTableName);
+	vector<string> oldTableColumnNames = oldTable->columnNames();
+	//Loop through the rows.
+	//If each row passes the test, then add it to the new table
+	for(int i = 0; i < oldTable->rowCount(); i++) {
+
+		vector<string> thisRow = oldTable->getRow(i);
+
+		//Make sure the row passes each expression
+		bool rowPasses = false;
+		for(int k = 0; k < expTree.size(); k++) {
+
+			rowPasses = expTree[k]->isTrue(oldTableColumnNames, thisRow);
+			if(!rowPasses) {
+				break;
+			}
+		}
+
+		//If there's not comparators, then it auto passes!
+		if(expTree.size() == 0) {
+			rowPasses = true;
+		}
+
+		//Now if they used the AS operator, then we need to
+		//assign the values to the new column names
+		if(rowPasses) {
+
+			//Loop through the mapping and set the new column names
+			//Then find the old column name's value to replace
+			map<string, string>::iterator oldToNewColumnsIt;
+			vector<string> columnNamesToAdd;
+			vector<string> columnDataToAdd;
+
+			for(oldToNewColumnsIt = oldToNewColumns.begin(); oldToNewColumnsIt != oldToNewColumns.end(); oldToNewColumnsIt++) {
+
+				string oldName = oldToNewColumnsIt->first;
+				string newName = oldToNewColumnsIt->second;
+
+				columnNamesToAdd.push_back(newName);
+
+				//Loop through the column names and at that
+				//index add the data from the row
+				bool columnFound = false;
+				for(int j = 0; j < oldTableColumnNames.size(); j++) {
+					if(oldTableColumnNames[j] == oldName) {
+						columnDataToAdd.push_back(thisRow[j]);
+						columnFound = true;
+					}
+				}
+
+				//Make sure the old column name was found
+				if(!columnFound) {
+					throw DatabaseException(20, oldName + " does not exist");
+				}
+			}
+
+			//Now add the successful row!
+			addRowToTable(newTableName, columnNamesToAdd, columnDataToAdd);
+		}
+	}
+}
+
+void Database::deleteParsing(Query_parser* p){ //ADDED
+	string tableName=p->tables[0];
+	vector<LogicExpression::ExpressionTree*> expTree=p->trees;
+
+	Table * table = findTable(tableName);
+
+	if(table == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+
+	vector<string> columnNames = table->columnNames();
+
+	//Loop through the rows.
+	//If each row passes the test, then remove it from the table
+	for(int i = 0; i < table->rowCount(); i++) {
+		
+		vector<string> thisRow = table->getRow(i);
+		
+		//Make sure the row passes each exression
+		bool rowPasses = false;
+		for(int k = 0; k < expTree.size(); k++) {
+			//FIXX: IS THIS RIGHT?
+			rowPasses = expTree[k]->isTrue(columnNames, thisRow);
+			if(!rowPasses) {
+				break;
+			}
+		}
+
+		//If there's not comparators, then it auto passes!
+		if(expTree.size() == 0) {
+			rowPasses = true;
+		}
+
+		//Now if they used the AS operator, then we need to
+		//assign the values to the new column names
+		if(rowPasses) {
+			table->deleteRow(i);
+		}
+	}
+}
+
+float Database::sumStatement(Query_parser* p,string columnName){ //ADDED
+	string tableName=p->tables[0];
+	vector<LogicExpression::ExpressionTree*> expTree=p->trees;
+
+	Table * table = findTable(tableName);
+
+	if(table == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+	Column * column = table->findColumn(columnName);
+
+	if(column == NULL) {
+		throw DatabaseException(20, columnName + " does not exist.");
+	}
+
+	string colType = column->getColumnType();
+	if(colType != "int" && colType != "float") {
+		throw DatabaseException(24, columnName + " must be of type int or float");
+	}
+
+	vector<string> columnNames = table->columnNames();
+	double sum = 0.0;
+	int colIndex = -1;
+
+	for(int i = 0; i < columnNames.size(); i++) {
+		if(columnNames[i] == columnName) {
+			colIndex = i;
+			break;
+		}
+	}
+
+
+
+	//Loop through the rows.
+	//If each row passes the test, then remove it from the table
+	for(int i = 0; i < table->rowCount(); i++) {
+		
+		vector<string> thisRow = table->getRow(i);
+		
+		//Make sure the row passes each exression
+		bool rowPasses = false;
+		for(int k = 0; k < expTree.size(); k++) {
+			//FIXX: IS THIS RIGHT?
+			rowPasses = expTree[k]->isTrue(columnNames, thisRow);
+			if(!rowPasses) {
+				break;
+			}
+		}
+
+		//If there's not comparators, then it auto passes!
+		if(expTree.size() == 0) {
+			rowPasses = true;
+		}
+
+		//Now if they used the AS operator, then we need to
+		//assign the values to the new column names
+		if(rowPasses) {
+			sum += atof(thisRow[i].c_str());
+		}
+	}
+
+	return sum;
+}
+
+float Database::minMaxStatement(Query_parser* p, string columnName, bool min){ //ADDED
+	string tableName=p->tables[0];
+	vector<LogicExpression::ExpressionTree*> expTree=p->trees;
+
+	Table * table = findTable(tableName);
+
+	if(table == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+	Column * column = table->findColumn(columnName);
+
+	if(column == NULL) {
+		throw DatabaseException(20, columnName + " does not exist.");
+	}
+
+	string colType = column->getColumnType();
+	if(colType != "int" && colType != "float") {
+		throw DatabaseException(24, columnName + " must be of type int or float");
+	}
+
+	vector<string> columnNames = table->columnNames();
+	double outlier = 0.0;
+	int colIndex = -1;
+
+	for(int i = 0; i < columnNames.size(); i++) {
+		if(columnNames[i] == columnName) {
+			colIndex = i;
+			break;
+		}
+	}
+
+
+
+	//Loop through the rows.
+	//If each row passes the test, then remove it from the table
+	for(int i = 0; i < table->rowCount(); i++) {
+		
+		vector<string> thisRow = table->getRow(i);
+		
+		//Make sure the row passes each exression
+		bool rowPasses = false;
+		for(int k = 0; k < expTree.size(); k++) {
+			//FIXX: IS THIS RIGHT?
+			rowPasses = expTree[k]->isTrue(columnNames, thisRow);
+			if(!rowPasses) {
+				break;
+			}
+		}
+
+		//If there's not comparators, then it auto passes!
+		if(expTree.size() == 0) {
+			rowPasses = true;
+		}
+
+		//Now if they used the AS operator, then we need to
+		//assign the values to the new column names
+		if(rowPasses) {
+			float val = atof(thisRow[i].c_str());
+			if(min) {
+				if(outlier > val) {
+					outlier = val;
+				}
+			}
+			else {
+				if(outlier < val) {
+					outlier = val;
+				}
+			}
+		}
+	}
+
+	return outlier;
+}
+
+int Database::countStatement(Query_parser* p){ //ADDED
+	string tableName=p->tables[0];
+	vector<LogicExpression::ExpressionTree*> expTree=p->trees;
+
+	Table * table = findTable(tableName);
+
+	if(table == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+
+	vector<string> columnNames = table->columnNames();
+	int count = 0;
+
+	//Loop through the rows.
+	//If each row passes the test, then remove it from the table
+	for(int i = 0; i < table->rowCount(); i++) {
+		
+		vector<string> thisRow = table->getRow(i);
+		
+		//Make sure the row passes each exression
+		bool rowPasses = false;
+		for(int k = 0; k < expTree.size(); k++) {
+			//FIXX: IS THIS RIGHT?
+			rowPasses = expTree[k]->isTrue(columnNames, thisRow);
+			if(!rowPasses) {
+				break;
+			}
+		}
+
+		//If there's not comparators, then it auto passes!
+		if(expTree.size() == 0) {
+			rowPasses = true;
+		}
+
+		//Now if they used the AS operator, then we need to
+		//assign the values to the new column names
+		if(rowPasses) {
+			count++;
+		}
+	}
+
+	return count;
+}
+
+
+void Database::updateParsing(Query_parser* p,vector<string> columnNames,vector<string> columnData,string tableName) {
+	vector<LogicExpression::ExpressionTree*> expTree=p->trees;
+	Table * table = findTable(tableName);
+
+	if(table == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+	vector<string> TableColumnNames = table->columnNames();
+	//Loop through the rows.
+	//If each row passes the test, then remove it from the table
+	for(int i = 0; i < table->rowCount(); i++) {
+		vector<string> thisRow = table->getRow(i);
+		
+		//Make sure the row passes each exression
+		bool rowPasses = false;
+		for(int k = 0; k < expTree.size(); k++) {
+			//FIXX: IS THIS RIGHT?
+			rowPasses = expTree[k]->isTrue(TableColumnNames, thisRow);
+			if(!rowPasses) {
+				break;
+			}
+		}
+
+		//If there's not comparators, then it auto passes!
+		if(expTree.size() == 0) {
+			rowPasses = true;
+		}
+
+		//Now if they used the AS operator, then we need to
+		//assign the values to the new column names
+		if(rowPasses) {
+			table->updateRow(i, columnNames, columnData);
+		}
+	}
+}
+
+//Set the Primary Key for a table given the table name and given the column name
+void Database::setPrimaryKey(string tableName, string colName) {
+	Table *theTable = findTable(tableName);
+
+	if(theTable == NULL) {
+		throw DatabaseException(10, tableName + " does not exist.");
+	}
+
+	theTable->setPrimaryKey(colName);
+}
+
+//output to the screen all tables in database
+string Database::printAllTables()
+{
+	string s = "";
+	map<string,Table*>::iterator it;
+	for(it=tableList.begin();it!=tableList.end();it++)
+	{
+		s += printTable((*it).first);
+	}
+	return s;
+}

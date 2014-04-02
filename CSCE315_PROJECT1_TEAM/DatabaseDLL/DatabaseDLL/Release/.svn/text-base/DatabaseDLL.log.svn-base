@@ -1,0 +1,118 @@
+﻿Build started 2/29/2012 4:56:18 AM.
+     1>Project "H:\CSCE315\GroupAssignment1\DatabaseDLL\DatabaseDLL\DatabaseDLL.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Release\DatabaseDLL.lastbuildstate".
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.CppClean.targets(74,5): warning : Access to the path 'H:\CSCE315\GROUPASSIGNMENT1\DATABASEDLL\RELEASE\DATABASEDLL.PDB' is denied.
+       InitializeBuildStatus:
+         Creating "Release\DatabaseDLL.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D DATABASEDLL_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt Column.cpp Database.cpp DatabaseDLL.cpp Date.cpp ExpressionTree.cpp FunctionalDatabaseDLL.cpp global_parsing_methods.cpp LogicHandler.cpp main.cpp OPERATIONS.cpp parser.cpp Query_parser.cpp Table.cpp Table_parser.cpp Time.cpp
+         Column.cpp
+     1>Column.cpp(21): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(96): warning C4018: '>' : signed/unsigned mismatch
+     1>Column.cpp(175): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(186): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(194): warning C4018: '>' : signed/unsigned mismatch
+     1>Column.cpp(199): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(212): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(229): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(334): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(340): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(346): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(352): warning C4018: '<' : signed/unsigned mismatch
+     1>Column.cpp(358): warning C4018: '<' : signed/unsigned mismatch
+         Database.cpp
+     1>Database.cpp(290): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(320): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(351): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(459): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(505): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(550): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(600): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(614): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(635): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>Database.cpp(672): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(687): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(703): warning C4244: 'initializing' : conversion from 'double' to 'float', possible loss of data
+     1>Database.cpp(716): warning C4244: 'return' : conversion from 'double' to 'float', possible loss of data
+     1>Database.cpp(743): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(785): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(818): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(827): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(894): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(923): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(957): warning C4018: '<' : signed/unsigned mismatch
+     1>Database.cpp(987): warning C4018: '<' : signed/unsigned mismatch
+         DatabaseDLL.cpp
+         Date.cpp
+         ExpressionTree.cpp
+     1>ExpressionTree.cpp(64): warning C4018: '<' : signed/unsigned mismatch
+     1>ExpressionTree.cpp(354): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>ExpressionTree.cpp(356): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(372): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(376): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(378): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(395): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(399): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(401): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(418): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(422): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(424): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(441): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(445): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+     1>ExpressionTree.cpp(447): warning C4244: 'argument' : conversion from 'float' to 'char', possible loss of data
+         FunctionalDatabaseDLL.cpp
+         global_parsing_methods.cpp
+     1>global_parsing_methods.cpp(15): warning C4018: '<' : signed/unsigned mismatch
+     1>global_parsing_methods.cpp(19): warning C4018: '<' : signed/unsigned mismatch
+     1>global_parsing_methods.cpp(29): warning C4018: '<' : signed/unsigned mismatch
+         LogicHandler.cpp
+     1>LogicHandler.cpp(139): warning C4018: '<' : signed/unsigned mismatch
+     1>LogicHandler.cpp(178): warning C4018: '<' : signed/unsigned mismatch
+     1>LogicHandler.cpp(195): warning C4018: '<' : signed/unsigned mismatch
+         main.cpp
+         OPERATIONS.cpp
+         parser.cpp
+         Query_parser.cpp
+     1>Query_parser.cpp(64): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(175): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(177): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(221): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(267): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(285): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(380): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(383): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(396): warning C4018: '<' : signed/unsigned mismatch
+     1>Query_parser.cpp(426): warning C4018: '<' : signed/unsigned mismatch
+         Table.cpp
+     1>Table.cpp(104): warning C4018: '<' : signed/unsigned mismatch
+     1>Table.cpp(126): warning C4018: '<' : signed/unsigned mismatch
+     1>Table.cpp(172): warning C4018: '<' : signed/unsigned mismatch
+         Table_parser.cpp
+     1>Table_parser.cpp(121): warning C4018: '<' : signed/unsigned mismatch
+         Time.cpp
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"H:\CSCE315\GroupAssignment1\DatabaseDLL\Release\DatabaseDLL.dll" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\DatabaseDLL.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"H:\CSCE315\GroupAssignment1\DatabaseDLL\Release\DatabaseDLL.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"H:\CSCE315\GroupAssignment1\DatabaseDLL\Release\DatabaseDLL.lib" /MACHINE:X86 /DLL Release\Column.obj
+         Release\Database.obj
+         Release\DatabaseDLL.obj
+         Release\Date.obj
+         Release\ExpressionTree.obj
+         Release\FunctionalDatabaseDLL.obj
+         Release\global_parsing_methods.obj
+         Release\LogicHandler.obj
+         Release\main.obj
+         Release\OPERATIONS.obj
+         Release\parser.obj
+         Release\Query_parser.obj
+         Release\Table.obj
+         Release\Table_parser.obj
+         Release\Time.obj
+            Creating library H:\CSCE315\GroupAssignment1\DatabaseDLL\Release\DatabaseDLL.lib and object H:\CSCE315\GroupAssignment1\DatabaseDLL\Release\DatabaseDLL.exp
+         Generating code
+         Finished generating code
+     1>LINK : fatal error LNK1201: error writing to program database 'H:\CSCE315\GroupAssignment1\DatabaseDLL\Release\DatabaseDLL.pdb'; check for insufficient disk space, invalid path, or insufficient privilege
+     1>Done Building Project "H:\CSCE315\GroupAssignment1\DatabaseDLL\DatabaseDLL\DatabaseDLL.vcxproj" (rebuild target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:22.43

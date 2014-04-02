@@ -1,0 +1,96 @@
+CREATE TABLE first_table
+(first_name varchar(50),
+columnNumber int,
+Creation_day date,
+Creation_time time,
+smallestValue int,
+PRIMARY KEY columnNumber,
+PRIMARY KEY first_name);
+
+PRINT ALL;
+
+INSERT INTO first_table (first_name,columnNumber,Creation_day,Creation_time,smallestValue)
+(first_data,0,2010/10/20,12:12:20,20);
+
+INSERT INTO first_table (first_name,columnNumber,Creation_day,Creation_time,smallestValue)
+(second_data,1,2010/10/20,12:12:20,50);
+
+INSERT INTO first_table (first_name,columnNumber,Creation_day,Creation_time,smallestValue)
+(third_data,2,2010/10/20,12:12:20,10);
+
+INSERT INTO first_table (first_name,columnNumber,Creation_day,Creation_time,smallestValue)
+(fourth_data,3,2010/10/20,12:12:20,5);
+
+
+CREATE TABLE first_table2
+(first_name varchar(50),
+columnNumber int,
+smallestValue int,
+PRIMARY KEY columnNumber,
+PRIMARY KEY first_name);
+
+INSERT INTO first_table2 (first_name,columnNumber,smallestValue)
+(first_data,0,10);
+
+INSERT INTO first_table2 (first_name,columnNumber,smallestValue)
+(quarter_data,1,23);
+
+INSERT INTO first_table2 (first_name,columnNumber,smallestValue)
+(data_2,-1,5);
+
+PRINT ALL;
+
+SELECT *
+FROM first_table
+WHERE (smallestValue >= 10.00) && (first_name = first_data)
+STORE third_table;
+
+PRINT ALL;
+
+SELECT first_table.Creation_day AS cr_day,columnNumber AS NUMBER, first_table2.first_name AS first_name
+FROM first_table JOIN first_table2 ON first_table.columnNumber = first_table2.columnNumber
+STORE joined;
+
+PRINT ALL;
+
+SELECT COUNT(first_name) AS names,SUM(columnNumber) AS sumOfNumbers,MAX(smallestValue) AS max
+FROM first_table
+STORE second_table;
+
+SELECT smallestValue AS values
+FROM first_table
+STORE counted_table;
+
+PRINT ALL;
+
+SELECT *
+FROM first_table
+WHERE first_table.smallestValue >ANY counted_table
+STORE anyTable;
+
+SELECT *
+FROM first_table
+WHERE smallestValue >ANY counted_table
+STORE anyTable2;
+
+PRINT ALL;
+
+
+SELECT *
+FROM first_table
+WHERE (smallestValue >= 10.00) && (first_name = first_data)
+STORE fourth_table;
+
+PRINT ALL;
+
+SELECT columnNumber,Creation_day AS days
+FROM first_table;
+
+
+PRINT ALL;
+
+UPDATE TABLE first_table (first_name) (BLABITTY_BLAH) WHERE columnNumber>=3;
+
+PRINT ALL;
+
+STOP;

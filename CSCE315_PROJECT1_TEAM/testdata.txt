@@ -1,0 +1,9 @@
+SELECT id, first_name 
+FROM student_details 
+WHERE first_name IN (SELECT first_name 
+FROM student_details 
+WHERE subject= 'Science');
+ 
+SELECT p.product_name FROM product p 
+WHERE p.product_id = (SELECT o.product_id FROM order_items o 
+WHERE o.product_id = p.product_id);

@@ -1,0 +1,145 @@
+body {
+	margin: 0px;
+	padding: 0px;
+	font-family: 14px Calibri, Arial, Tahoma;
+	background: green;
+}
+
+#header {
+	width: 900px;
+	margin: 0px auto 0px auto;
+	padding: 3px;
+	clear: both;
+	border: 2px solid #000;
+}
+
+#logo {
+	width: 400px;
+	margin: 0px auto 0px auto;
+	padding: 3px;
+	float: left;
+}
+
+#hsubscribe {
+	width: 400px;
+	margin: 0px auto 0px auto;
+	padding: 3px;
+	float: right;
+}
+
+#navbar {
+	width: 900px;
+	margin: 0px auto 0px auto;
+	padding: 3px;
+	clear: both;
+}
+
+#navbar ul {
+	margin: 0px; 
+	padding: 3px; 
+	list-style-type: none; 
+	list-style-image: none; 
+}
+	
+#navbar li {
+	display: inline; 
+}
+
+#navbar ul li a {
+	text-decoration:none;  
+	margin: 4px;
+	padding: 5px 20px 5px 20px; 
+	color: black;
+	background: gray;
+}
+	
+#navbar ul li a:hover {
+	color: black;
+	background: yellow; 
+}
+
+#container {
+	overflow: auto;
+	width: 900px;
+	heigth: 900px;
+	margin: 0px auto 0px auto;
+	clear: both;
+}
+
+#content {
+	width: 900px;
+	height: 500px;
+	margin: 0px auto 0px auto;
+	clear: both;
+}
+
+#about {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: red;
+}
+
+#about {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: red;
+}
+
+#calendar {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: blue;
+}
+
+#events {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: yellow;
+}
+
+#home {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: white;
+}
+
+#login {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: purple;
+}
+
+#signup {
+	width: 700px;
+	height: 500px;
+	float: left;
+	border: 2px solid #000;
+	background: green;
+}
+
+#sidebar {
+	width: 150px;
+	height: 500px;
+	float: right;
+	border: 2px solid #000;
+	background: #FFFFFF;
+}
+
+#footer {
+	width: 900px;
+	margin: 0px auto 0px auto;
+	border: 2px solid #000;
+	clear: both;
+}

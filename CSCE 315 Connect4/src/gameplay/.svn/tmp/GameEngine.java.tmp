@@ -1,0 +1,282 @@
+package gameplay;
+
+import java.awt.Color;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import GUI.MainFrame;
+import brains.AI;
+import brains.Move;
+
+public class GameEngine extends Thread
+{
+	public static int previous_Move;
+<<<<<<< .mine
+	private static MainFrame m;
+	private static GridStorage grid;
+	private static AI ai1;
+	private static AI ai2;
+	private static int turnCounter=1;
+	static int numberOfPlayers=2;
+=======
+	Image winnerScreen;
+	static boolean playerWinner = false;
+	static boolean computerWinner = false;
+	private JLabel winner;
+	
+>>>>>>> .r36
+	public GameEngine()
+	{
+		winnerScreen = Toolkit.getDefaultToolkit().getImage("images/winnerScreen.png");
+	
+		previous_Move=0;
+		if(grid==null)
+		{
+			grid=new GridStorage();
+		}
+		if(m==null)
+		{
+			EventQueue.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						MainFrame frame = new MainFrame();
+						GameEngine.setMainFrame(frame);
+						frame.setVisible(true);
+						m=frame;
+					} catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+		if(ai1==null)
+		{
+			ai1=new AI();
+			ai1.start();
+			ai1.setMyPieceType(1);
+			ai1.setEnemyPieceType(2);
+		}
+		
+		if(ai2==null)//TODO ONLY NEEDED IF TWO AI PLAY EACH OTHER
+		{
+			ai2=new AI();
+			ai2.start();
+			ai2.setMyPieceType(2);
+			ai2.setEnemyPieceType(1);
+		}
+		
+	}
+	/**
+	 * This is will handle movement
+	 * right now the grid is in the class grid it should be later moved to accommodate other things
+	 * @param x
+	 * @param y
+	 * @param piece
+	 */
+	public static void makeMove(Move m)
+	{
+		int piece=m.getPiece();
+		System.out.println("moving "+piece);
+		if(previous_Move!=0 && piece==previous_Move&&piece>0) {
+				System.out.print("Error: Not your turn!");
+				return;
+     	}
+		grid.setPiece(m);
+		if(ai1!=null)
+		{
+			ai1.retrieveBoard(grid.getGrid());//TODO CHANGE THIS
+			ai1.getLatestMove(grid.lastMove());
+		}
+		if(ai2!=null)
+		{
+			ai2.retrieveBoard(grid.getGrid());
+			ai2.getLatestMove(grid.lastMove());
+		}
+		previous_Move = piece;
+		turnCounter++;
+		if(turnCounter>numberOfPlayers)
+		{
+			turnCounter=1;
+		}
+	//	getMainFrame().makeMove(x,y,piece);
+	}
+	public static synchronized void update()
+	{
+		m.repaint();
+		//other updating things happen here
+	}
+	public static MainFrame getMainFrame()
+	{
+		return m;
+	}
+	public static void setMainFrame(MainFrame m)
+	{
+		GameEngine.m = m;
+	}
+	@Override
+	public void run()
+	{
+		while(true)
+		{
+			try
+			{
+	//			System.out.println("UPDATE THREAD");
+				update();
+				this.sleep(20);
+			}catch(Exception e)
+			{
+				
+			}
+		}
+	}
+	public static void makeAiMove()
+	{
+		Move b=null;
+		if(turnCounter==1)
+		{
+			b=ai1.getBestMove();
+		}else if(turnCounter==2)
+		{
+			b=ai2.getBestMove();
+		}
+		makeMove(b);
+	}
+	public static int[][] getGridCopy()
+	{
+		return grid.getGrid();
+	}
+	public static void setGridLengths(int yNum, int xNum)
+	{
+		grid.setGridLengths(yNum,xNum);
+	}
+	public static boolean gameWon()
+	{
+		int [][] gridarr = grid.getGrid();
+		int rows=gridarr.length;
+		int cols=gridarr[0].length;
+		for(int i=0;i<rows;i++) {
+			for(int j=0;j<cols;j++) {
+				    int sum=0;
+					for(int k=0;k<4;k++) {
+						 if(i+k<rows)  sum+=gridarr[i+k][j];
+					}
+					if(sum==4 || sum==-4) {
+						if(sum==4){
+							computerWinner = true;
+						   System.out.print("Computer wins!!!!!!!\n");
+						}
+						else {
+							playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+							}
+					}	
+					sum=0;
+					for(int k=0;k<4;k++) {
+						 if(j+k<cols) { sum+=gridarr[i][j+k];}
+					}
+					if((sum==4 || sum==-4)) {
+						if(sum==4){
+							computerWinner = true;
+						   System.out.print("Computer wins!!!!!!!\n");
+						}
+						else {
+							playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+							}
+					}
+					sum=0;
+					for(int k=0;k<4;k++) {
+						 if(i+k<rows && j+k<cols) { sum+=gridarr[i+k][j+k];}
+					}
+					if((sum==4 || sum==-4)) {
+						if(sum==4){
+							computerWinner = true;
+							System.out.print("Computer wins!!!!!!!\n");
+						}
+						else {
+							playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+						}
+					}
+					sum=0;
+					for(int k=0;k<4;k++) {
+						 if(i+k<rows && j-k>0) { sum+=gridarr[i+k][j-k];}
+					}
+					if((sum==4 || sum==-4)) {
+						if(sum==4){
+							computerWinner = true;
+							System.out.print("Computer wins!!!!!!!\n");
+						}
+						else {
+							playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+						}
+					}
+			 }  
+		}
+		return false;
+	}
+<<<<<<< .mine
+	public static int getTurnCounter()
+=======
+	
+	// This doesn't work. 
+	public void paint(Graphics g)
+	{
+		if(computerWinner == true){
+			JFrame frame = new JFrame();
+			frame.setSize(1280,1024);
+			
+			g.drawImage(winnerScreen, 0, 0, null);
+			if(winnerScreen.getWidth( null )==-1)
+			{
+				winnerScreen = Toolkit.getDefaultToolkit().getImage("src/GUI/images/winnerScreen.png");
+			}
+			
+		    winner = new JLabel();
+		    winner.setText("Computer Won!");
+		    winner.setFont(new Font("Courier", Font.BOLD, 80));
+		    winner.setForeground(Color.white);
+		    winner.setBounds(0,0, 400, 200);
+			frame.add(winner);
+		}
+		else if(playerWinner == true){
+			JFrame frame = new JFrame();
+			frame.setSize(1280,1024);
+			
+			g.drawImage(winnerScreen, 0, 0, null);
+			if(winnerScreen.getWidth( null )==-1)
+			{
+				winnerScreen = Toolkit.getDefaultToolkit().getImage("src/GUI/images/winnerScreen.png");
+			}
+			
+			
+		    winner = new JLabel();
+		    winner.setText("Player 1 Won!");
+		    winner.setFont(new Font("Courier", Font.BOLD, 80));
+		    winner.setForeground(Color.white);
+		    winner.setBounds(0,0, 400, 200);
+			frame.add(winner);
+		}
+		//super.paint(g);
+	}
+	public static synchronized void update()
+>>>>>>> .r36
+	{
+		return turnCounter;
+	}
+	public static void setTurnCounter(int turnCounter)
+	{
+		GameEngine.turnCounter = turnCounter;
+	}
+}

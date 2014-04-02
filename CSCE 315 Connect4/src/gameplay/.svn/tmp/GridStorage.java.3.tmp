@@ -1,0 +1,313 @@
+package gameplay;
+
+import java.util.ArrayList;
+
+import brains.Move;
+
+/**
+ * This class is so that all concurrent threads trying to access the grid will only do so through a synchronized method
+ * @author gigemjt
+ *
+ */
+public class GridStorage
+{
+	public GridStorage fakeGrid=null;//this will be a copy that can only be affected by all types of set pieces but wont affect other grid
+	private int[][] grid;
+	Move lastMove;
+	ArrayList<Move> moves;
+	public GridStorage()
+	{
+		moves=new ArrayList<Move>();
+		grid=new int[1][1];
+	}
+	public synchronized int[][] getGrid()
+	{
+		//Sharath - Can just return grid, than return copy.
+		//David u have to because then java will try an synch everything
+		int[][] copy=new int[grid.length][grid[0].length];
+		for(int k=0;k<grid.length;k++)
+		{
+			for(int q=0;q<grid[0].length;q++)
+			{
+				copy[k][q]=grid[k][q];
+			}
+		}
+		return copy;
+	}
+	public synchronized void setPiece(int x, int y, int piece)
+	{
+		if(piece==-1)
+		{
+			flipBoard();
+			return;
+		}
+		if(piece==-2)
+		{
+			removePiece(x,y,piece);
+			return;
+		}
+		//depending on type of move it will implement it here!!!!
+		int tempy=0;
+		while(tempy<grid.length&&grid[tempy][x]==0)
+		{
+			tempy++;
+		}
+		tempy-=1;
+		if(tempy<0)
+			return;
+		if(grid[tempy][x]==0||piece==0)
+			grid[tempy][x]=piece;
+		lastMove=new Move(x,tempy,piece);
+	}
+	public synchronized Move lastMove()
+	{
+		return new Move(lastMove);
+	}
+	public synchronized void setGrid(int[][] grid)
+	{
+		this.grid = grid;
+	}
+	public synchronized void setGridLengths(int yNum, int xNum)
+	{
+		grid=new int[yNum][xNum];
+	}
+	public void printGrid()
+	{
+		for(int[]arr: grid)
+		{
+			for(int inx:arr)
+			{
+				System.out.print(inx);
+			}
+			System.out.println();
+		}
+	}
+	public static void printGrid(int[][]grid)
+	{
+		for(int[]arr: grid)
+		{
+			for(int inx:arr)
+			{
+				System.out.print(inx);
+			}
+			System.out.println();
+		}
+	}
+	public void createFakeGrid()
+	{
+		fakeGrid=new GridStorage();
+	}
+	public void setPiece(Move m)
+	{
+		moves.add(m);
+		setPiece(m.getX(),m.getY(),m.getPiece());
+		if(fakeGrid!=null)
+		{
+			fakeGrid.setPiece(m);
+		}
+	}
+	public void flipBoard()
+	{
+		//create new board
+		int [][] gridFlip = grid;
+		int numRows=gridFlip.length;
+		int numCols=gridFlip[0].length;	
+		//Get rows and columns not empty
+		for(int j=0; j<numCols; j++){
+			int [] pieceArray = new int[100];
+			int pieceArrayLen = 0;
+			//pieceArray -> get all the pieces 
+			for(int i=0; i< numRows; i++){
+				//Initialize the pieceArray
+				if(gridFlip[i][j] != 0){
+					pieceArray[pieceArrayLen] = gridFlip[i][j];
+					pieceArrayLen++;			
+				}	
+			}
+			//Add the pieceArray back to column
+			for(int i=0; i< pieceArrayLen; i++){
+				gridFlip[numRows - i - 1][j] = pieceArray[i];
+			}
+		}
+		grid = gridFlip;
+	}
+	
+	public void removePiece(int x_row,int y_column,int piece)
+	{
+		//remove a piece in grid
+		y_column = grid.length-1;
+		int [][] gridChange = grid;
+		////pieceArray -> get all the pieces 
+		for(int i=y_column; i>1; i--){
+			//Initialize the pieceArray
+			gridChange[i][x_row] = gridChange[i-1][x_row];
+		}	
+		//Add a zero to the top
+		gridChange[0][x_row] = 0;
+		grid = gridChange;
+	}
+	
+	public boolean gameWon()
+	{
+		int totalsum=0;
+		int piece = lastMove.getPiece();
+		int[][] gridarr=grid;
+		int rows=gridarr.length;
+		int cols=gridarr[0].length;
+		for(int i=0;i<rows;i++) {
+			for(int j=0;j<cols;j++) {
+					piece=gridarr[i][j];
+				    int sum=0;
+					for(int k=0;k<4;k++) {
+						 if(i+k<rows)  sum+=gridarr[i+k][j];
+					}
+					if(sum==4*piece) {
+						if(sum==4*piece){
+				//			computerWinner = true;
+						   System.out.print("Someone wins!!!!!!!\n");
+						//   d.winnerScreen();
+						}
+						else {
+				//			playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+						//	d.winnerScreen();
+							}
+					}	
+					sum=0;
+					for(int k=0;k<4;k++) {
+						 if(j+k<cols) { sum+=gridarr[i][j+k];}
+					}
+					if((sum==4*piece)) {
+						if(sum==4*piece){
+				//			computerWinner = true;
+						   System.out.print("Someone wins!!!!!!!\n");
+					//	   d.winnerScreen();
+					}
+						else {
+				//			playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+					//		d.winnerScreen();
+							}
+					}
+					sum=0;
+					for(int k=0;k<4;k++) {
+						 if(i+k<rows && j+k<cols) { sum+=gridarr[i+k][j+k];}
+					}
+					if((sum==4*piece)) {
+						if(sum==4*piece){
+				//			computerWinner = true;
+							System.out.print("Someone wins!!!!!!!\n");
+			//				d.winnerScreen();
+					}
+						else {
+				//			playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+			//				d.winnerScreen();
+						}
+					}
+					sum=0;
+					for(int k=0;k<4;k++) {
+						 if(i+k<rows && j-k>0) { sum+=gridarr[i+k][j-k];}
+					}
+					if((sum==4*piece)) {
+						if(sum==4*piece){
+				//			computerWinner = true;
+							System.out.print("Someone wins!!!!!!!\n");
+			//				d.winnerScreen();							 
+						}
+						else {
+				//			playerWinner = true;
+							System.out.print("Congrats! You win!!!!!!!\n");
+			//				d.winnerScreen();
+						}
+					}
+			 }  
+		}
+		return false;
+	}
+	public boolean gameWonMove(Move m)
+	{
+		int x=m.getX();
+		int y=m.getY();
+		int piece=m.getPiece();
+		int numberInRow=4;
+		int totalsum=numberInRow;//piece*numberInRow;
+		boolean left,right,up,down;
+			left=(x-numberInRow)>=0;
+			right=(x+numberInRow)<grid[0].length;
+			up=y-numberInRow>=0;
+			down=y+numberInRow<grid.length;
+			
+		int sumLeft=0;
+		int sumUpLeft=0;
+		int sumDownLeft=0;
+		
+		int sumRight=0;
+		int sumUpRight=0;
+		int sumDownRight=0;
+		
+		int sumUp=0;
+		int sumDown=0;
+		
+		for(int k=0;k>=-numberInRow;k--)
+		{
+			if(left)
+			{
+				sumLeft+=grid[y][k+x]==piece?1:0;
+				if(up)
+					sumUpLeft+=grid[k+y][k+x]==piece?1:0;
+				if(down)
+					sumDownLeft+=grid[k-y][k+x]==piece?1:0;
+			}
+			if(right)
+			{
+				sumRight+=grid[y][x-k]==piece?1:0;
+				if(up)
+					sumUpRight+=grid[k+y][x-k]==piece?1:0;
+				if(down)
+					sumDownRight+=grid[k-y][x-k]==piece?1:0;
+			}
+			if(up)
+			{
+				sumUp+=grid[y+k][x]==piece?1:0;
+			}
+			if(down)
+			{
+				sumDown+=grid[y-k][x]==piece?1:0;
+			}
+		}
+		boolean won=sumLeft==totalsum||sumUpLeft==totalsum||sumDownLeft==totalsum;
+		won=won||sumRight==totalsum||sumUpRight==totalsum||sumDownRight==totalsum;
+		won=won||sumUp==totalsum||sumDown==totalsum;
+		if(won)
+		{
+			return true;
+		}
+		return false;
+	}
+	public boolean gameWonLastMove()
+	{
+		return gameWonMove(lastMove);
+	}
+	public int[][] getGridObject()
+	{
+		return grid;
+	}
+	public void undoMove(Move currentMove)
+	{
+		int piece=currentMove.getPiece();
+		if(piece==-1)
+		{
+			flipBoard();
+		}
+		if(piece==-2)
+		{
+			//undoes remove piece
+		}
+		if(piece>0)
+		{
+			moves.remove(currentMove);
+			this.setPiece(currentMove.getX(),currentMove.getY(),0);
+		}
+	}
+}

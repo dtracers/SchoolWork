@@ -1,0 +1,289 @@
+/*
+ * Query_parser.cpp
+ *
+ *  Created on: Jan 31, 2012
+ *      Author: gigemjt
+ */
+
+#include "Query_parser.h"
+#include "global_parsing_methods.h"
+
+Query_parser::Query_parser(string g,Database* DB)
+{
+	db=DB;
+	parse_query(g);
+	action();
+	//after it has all the data in a non single way it will do actions here
+}
+
+/**
+ * This will parse the main file
+ */
+void Query_parser::parse_query(string g)
+{
+	cout<<" the total string "<<g<<endl;
+	int select_index=g.find_first_of("SELECT");
+	int from_index=g.find("FROM");
+
+	//this will search after the select index
+	int sub_select=g.find("SELECT",from_index);
+	if(sub_select>0)
+	{
+		//there is a sub query!! so exciting
+		string search=g.substr(select_index,sub_select-select_index);
+		int start_parenth=search.find_last_of("(");//this should find the last one
+
+		//this will find the closing parenthesis
+		int count=1;
+		int index=start_parenth;
+		while(index<g.length()&&count>0)
+		{
+			if(g[index]=='(')
+				count++;
+			if(g[index]==')')
+				count--;
+			index++;
+		}
+		if(count==0)
+			index--;
+		string sub_query=g.substr(start_parenth+1,index-(start_parenth+2));
+		Query_parser sub_qrp(sub_query,db);
+		//it will have other things like a table name and a dot "."
+		string substitute=sub_qrp.get_single_selections();
+		string first=g.substr(0,start_parenth);
+		string second=g.substr(index,g.length());
+		g=first+substitute+second;
+		cout<<"MY NEW STRING IS "<<g<<endl;
+	}
+	int store_index=g.find("STORE");
+	if(store_index<0)
+	{
+	//	cerr<<"store doesnt exist\n "<<store_index<<endl;;
+		store_index=g.length();
+	}
+//	cout<<"from_index "<<from_index<<"endl";
+	string select=g.substr(select_index,from_index-select_index);
+	string from=g.substr(from_index,store_index-from_index);
+	string store=g.substr(store_index,g.length()-store_index);
+	select_parser(select);
+	from_parser(from);
+	store_parser(store);
+}
+/**
+ * This will parse items just inside the select statement
+ */
+void Query_parser::select_parser(string statement)
+{
+	cout<<"select statement "<<statement<<"\n";
+	stringstream stream(statement);
+	string pre_junk;
+	stream>>pre_junk;
+	string column;
+	stream>>column;
+	if(column=="*")
+	{
+		cout<<"this will do ALL the columns\n";
+		return;
+	}
+	int pos=statement.find_first_of(column);
+	int final_index=0;
+	while(pos>0)
+	{
+		final_index=pos;
+		int next=statement.find_first_of(',',pos);
+		string data="";
+		for(int index=pos;index<next;index++)
+		{
+			data+=statement[index];
+		}
+		//this will parse a single selection
+		single_selection(data);
+		pos=next+1;
+	}
+	string data="";
+	int last_index=statement.length();
+	for(int index=final_index;index<last_index;index++)
+	{
+		data+=statement[index];
+	}
+	single_selection(data);
+}
+
+/**
+ * This will evalutate all statments
+ */
+void Query_parser::single_selection(string g)
+{
+	if(g.length()<1)
+		return;
+	//it should be changed so that the line after the AS statement gets put here
+	int AS=g.find("AS");
+	string new_column_name;
+	string old_column_name;
+
+	//this will get the first name which is the old column name
+	stringstream stream(g);
+	stream>>old_column_name;
+	if(AS>0)
+	{
+		//the AS statement exist
+		string new_name=g.substr(AS,g.length());
+		stringstream stream(new_name);
+		string pre_junk;
+		stream>>pre_junk;
+		cout<<"pre_junk = AS? : "<<pre_junk<<"\n";
+		stream>>new_column_name;
+	}else
+	{
+		//if the as statement doesn't exist then the new column name is the old column name
+		new_column_name=old_column_name;
+	}
+	old_columns.push_back(old_column_name);
+	new_columns[old_column_name]=new_column_name;
+//	cout<<"new column name is "<<new_column_name<<"\n";
+//	cout<<"old column name is "<<old_column_name<<"\n";
+}
+
+/**
+ * This will return all of the tables that were in the result of the query
+ */
+string Query_parser::get_single_selections()
+{
+	string select="";
+	for(int k=0;k<old_columns.size();k++)
+	{
+		string after="";
+		if(k<old_columns.size()-1)
+			after=", ";
+		select+=new_columns[old_columns[k]]+after;
+	}
+	return select;
+}
+
+void Query_parser::from_parser(string g)
+{
+	int where=g.find("WHERE");
+	string table_part=g;
+	if(where>=0)
+	{
+		where_parser(g.substr(where,g.length()-where));
+		table_part=g.substr(0,where);
+	}
+	table_parser(table_part);
+}
+
+
+void Query_parser::where_parser(string g)
+{
+	vector<string> split=globalParse::get_separate_statments(g,",");
+	for(int k=0;k<split.size();k++)
+	{
+		LogicHandler handle(g);
+		handle.parse();
+		ExpressionTree* tree=handle.getTree();
+		trees.push_back(tree);
+	}
+	cout<<"where statement"<<g<<"\n";
+}
+
+void Query_parser::table_parser(string statement)
+{
+	stringstream stream(statement);
+	string pre_junk;
+	stream>>pre_junk;
+
+	string first_table;
+	string end_of_line;
+
+	stream>>first_table;
+	tables.push_back(first_table);
+
+	stream>>end_of_line;
+	cout<<"end of line "<<end_of_line<<endl;
+	if(statement.find(first_table)+first_table.size()<statement.size()-1&&end_of_line!="")
+	{
+		string second_table;
+		stream>>second_table;
+		cout<<"there are more than books here"<<endl;
+		int on_pos=statement.find("ON");
+		tables.push_back(second_table);
+		if(on_pos>0)
+		{
+			join_parser(statement.substr(on_pos,statement.length()-on_pos));
+		}
+		if(end_of_line=="NATURAL_JOIN")
+		{
+			//naturally join the two statements here!!!
+			//it requires that two of the columns have the same name
+		}
+	}
+	cout<<"from statement "<<statement<<"\n";
+}
+
+void Query_parser::join_parser(string statement)
+{
+	stringstream stream(statement);
+	string pre_junk;
+	stream>>pre_junk;
+	string first_half;
+	stream>>first_half;
+	string second_half;
+	stream>>pre_junk;//should be =
+	stream>>second_half;
+	cout<<"first half is "<<first_half<<endl;
+	cout<<"second half is "<<second_half<<endl;
+	cout<<"THE ON COMMAND IS "<<statement<<endl;
+	vector<string> first_bit=globalParse::get_separate_statments(first_half,".");
+	vector<string> second_bit=globalParse::get_separate_statments(second_half,".");
+	join_columns[first_bit[0]]=first_bit[1];
+	join_columns[second_bit[0]]=second_bit[1];
+	//BABOOOOM!!!!!
+}
+
+void Query_parser::store_parser(string g)
+{
+	if(g.length()<1)
+	{
+		static int temp_table_num;
+		stringstream m;
+		m<<temp_table_num;
+		temp_table_num++;
+		string name_num;
+		m>>name_num;
+		new_table_name="TEMP"+name_num;
+		cout<<"the table being stored is "<<new_table_name<<endl;
+		return;
+	}
+	stringstream stream(g);
+	string pre_junk;
+	stream>>pre_junk;
+	string table_name;
+	stream>>table_name;
+	cout<<"the table being stored is "<<table_name<<endl;
+	new_table_name=table_name;
+}
+
+void Query_parser::action()
+{
+	//db->
+	/*
+	db->createTable(new_table_name);//will crash if table exist
+	Table* new_table=db->findTable(new_table_name);//it now has the new table
+	if(tables.size()>1)
+	{
+		//holy mother of god!!!
+	}else
+	{
+		Table* old_table=db->findTable(tables[0]);//will crash if the table does not exist
+		//ponies!
+		for(int k=0;k<old_columns.size();k++)
+		{
+		//	new_table->createColumn(new_columns[old_Columns[k]],)
+		}
+	}
+	*/
+}
+
+Query_parser::~Query_parser() {
+	// TODO Auto-generated destructor stub
+}

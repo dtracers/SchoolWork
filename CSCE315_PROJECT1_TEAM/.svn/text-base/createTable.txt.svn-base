@@ -1,0 +1,27 @@
+CREATE TABLE customer
+(First_Name varchar(50),
+Last_Name varchar(50),
+Address varchar(50),
+City varchar(50),
+Country varchar(25),
+Birth_Date date,
+PRIMARY KEY First_Name);
+
+CREATE TABLE another_table
+(FIrst_COLUMN varchar(50),
+columnNumber int,
+Creation_day date,
+Creation_time time,
+PRIMARY KEY columnNumber,
+PRIMARY KEY FIrst_COLUMN);
+
+
+
+INSERT INTO another_table (FIrst_COLUMN,columnNumber,Creation_day,Creation_time)
+(first_data,50,2010/10/20,12:12:20);
+
+INSERT INTO another_table (FIrst_COLUMN,columnNumber,Creation_day,Creation_time)
+(secondData,53,2010/11/20,12:12:21);
+
+INSERT INTO another_table (FIrst_COLUMN,columnNumber,Creation_day,Creation_time)
+(secondData2,52,2010/11/20,12:12:21);

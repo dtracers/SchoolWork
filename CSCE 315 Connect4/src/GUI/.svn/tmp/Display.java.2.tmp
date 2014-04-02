@@ -1,0 +1,608 @@
+package GUI;
+
+import gameplay.GameEngine;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.TextField;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+
+public class Display extends JPanel implements ActionListener
+{
+	Graphics myG;
+	private Grid gr;
+	Image basicBackground;
+	Image computerImage1;
+	Image computerImage2;
+	Image computerImage3;
+	Image computerImage4;
+	Image computerImage5;
+	Image computerImage6;
+	Image winnerScreen;
+	private JLabel prompt;
+	private JLabel prompt2;
+	private JLabel size;
+	private JLabel name;
+	private JLabel firstName;
+	private JLabel secondName;
+	private JLabel score;
+	int numberOfPlayers = 1;
+	int randomNumber;
+	int player2 = 0;
+	int player1 = 0;
+	int playerOption = 0;
+	private boolean[] drawOnce = new boolean[5];
+	private TextField inputFieldx;
+	private TextField inputFieldy;
+	private JButton createButton;
+	private JButton flipItButton;
+	private JButton deleteButton;
+	
+	
+	private JLabel winnerLabel;
+	String winner1;
+	String winner2;
+	private JButton playAgainButton;
+	private JButton quitButton;
+	
+	boolean showWinnerScreen = false;
+	boolean updated=true;
+	String firstPlayer = "";
+	String firstPlayer2 = "";
+	double sX,sY;
+	int y = 0;
+	public Display(double scaleX, double scaleY)
+	{
+		sX=scaleX;
+		sY=scaleY;
+		setGrid(new Grid((int)(800.*scaleX),(int)(800.*scaleY),6,7,true));
+		setLayout(null);
+		basicBackground = Toolkit.getDefaultToolkit().getImage("images/basicBackground.png");
+		computerImage1 = Toolkit.getDefaultToolkit().getImage("images/childGirl.png");
+		computerImage2 = Toolkit.getDefaultToolkit().getImage("images/childBoy.png");
+		computerImage3 = Toolkit.getDefaultToolkit().getImage("images/adultGirl.png");
+		computerImage4 = Toolkit.getDefaultToolkit().getImage("images/adultBoy.png");
+		computerImage5 = Toolkit.getDefaultToolkit().getImage("images/grandmaGirl.png");
+		computerImage6 = Toolkit.getDefaultToolkit().getImage("images/grandpaBoy.png");
+		winnerScreen = Toolkit.getDefaultToolkit().getImage("images/winnerScreen.png");
+		
+		Random generator = new Random();
+		randomNumber = generator.nextInt(5);
+		System.out.println(randomNumber);
+		
+		setBoardSize();
+		highScoreSection();
+	}
+	public Display()
+	{
+		this(1,1);
+	}
+	
+	public void setValues1(int value){
+		player1 = value;
+	}
+	
+	public void setValues2(int value){
+		player2 = value;
+	}
+	
+	public void setName1(String name){
+		firstPlayer = name;
+		System.out.println("setName1()" + firstPlayer);
+		this.firstName.setText(firstPlayer);
+	}
+	
+	public void setName2(String name){
+		firstPlayer2 = name;
+		System.out.println("setName1()" + firstPlayer2);
+		this.secondName.setText(firstPlayer2);
+	}
+	
+	/**
+	 * in a jPanel everything in this method that uses g gets shown 
+	 * by saving the graphics it is possible to paint to the jPanel from everywhere
+	 * a jPanel in a JFrame is doubleBuffered by default
+	 */
+	public void paint(Graphics g)
+	{
+		g.setColor(Color.black);
+		
+		g.drawImage(basicBackground, 0, 0,(int)(1280.*sX),(int)(1024.*sY), null);
+		if(basicBackground.getHeight(null)==-1)
+		{
+			basicBackground = Toolkit.getDefaultToolkit().getImage("src/GUI/images/basicBackground.png");
+		}
+		gr.draw(g);
+		
+		setLayout(null);
+		if(!drawOnce[0]){
+			drawOnce[0]=true;
+		    prompt = new JLabel();
+		    prompt.setText("Player 1");
+		    prompt.setFont(new Font("Courier", Font.BOLD, 40));
+		    prompt.setForeground(Color.white);
+		    prompt.setBounds(955,85, 400, 200);
+		    Resize(prompt);
+			add(prompt);
+		}
+		
+		if(numberOfPlayers == 1){
+			if(!drawOnce[1]){
+				drawOnce[1]=true;
+			    prompt2 = new JLabel();
+			    prompt2.setText("Computer");
+			    prompt2.setFont(new Font("Courier", Font.BOLD, 40));
+			    prompt2.setForeground(Color.white);
+			    prompt2.setBounds(955,480, 400, 200);
+			    Resize(prompt2);
+				add(prompt2);
+			}
+				if(player1 == 1){
+					
+					g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage1.getWidth( null )==-1)
+					{
+						computerImage1 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childGirl.png");
+					}
+				}
+				else if(player1 == 2){
+					g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage2.getWidth( null )==-1)
+					{
+						computerImage2 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultGirl.png");
+					}
+				}
+				else if(player1 == 3){
+					g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage3.getWidth( null )==-1)
+					{
+						computerImage3 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandmaGirl.png");
+					}
+				}
+				else if(player1 == 4){
+					g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage4.getWidth( null )==-1)
+					{
+						computerImage4 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childBoy.png");
+					}
+				}
+				else if(player1 == 5){
+					g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage5.getWidth( null )==-1)
+					{
+						computerImage5 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultBoy.png");
+					}
+				}
+				else if(player1 == 6){
+					g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage6.getWidth( null )==-1)
+					{
+						computerImage6 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandpaBoy.png");
+					}
+				}
+			//Randomly chooses an opponent	
+			//Computer Image
+				if(randomNumber == 0){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage1.getWidth( null )==-1)
+					{
+						computerImage1 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childGirl.png");
+					}
+				}
+				else if(randomNumber == 1){
+					g.drawImage(computerImage2, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage2.getWidth( null )==-1)
+					{
+						computerImage2 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childBoy.png");
+					}
+				}
+				else if(randomNumber == 2){
+					g.drawImage(computerImage3, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage3.getWidth( null )==-1)
+					{
+						computerImage3 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultGirl.png");
+					}
+				}
+				else if(randomNumber == 3){
+					g.drawImage(computerImage4, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage4.getWidth( null )==-1)
+					{
+						computerImage4 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultBoy.png");
+					}
+				}
+				else if(randomNumber == 4){
+					g.drawImage(computerImage5, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage5.getWidth( null )==-1)
+					{
+						computerImage5 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandmaGirl.png");
+					}
+				}
+				else if(randomNumber == 5){
+					g.drawImage(computerImage6, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage6.getWidth( null )==-1)
+					{
+						computerImage6 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandpaBoy.png");
+					}
+				}
+		}
+		else if(numberOfPlayers == 2){
+			if(!drawOnce[1]){
+				drawOnce[1]=true;
+			    prompt2 = new JLabel();
+			    prompt2.setText("Player 2");
+			    prompt2.setFont(new Font("Courier", Font.BOLD, 40));
+			    prompt2.setForeground(Color.white);
+			    prompt2.setBounds(955,480, 400, 200);
+			    Resize(prompt2);
+				add(prompt2);
+			}
+			
+			// Player 1
+			if(player1 == 1){
+				g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+				if(computerImage1.getWidth( null )==-1)
+				{
+					computerImage1 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childGirl.png");
+				}
+			}
+			else if(player1 == 2){
+				g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+				if(computerImage2.getWidth( null )==-1)
+				{
+					computerImage2 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultGirl.png");
+				}
+			}
+			else if(player1 == 3){
+				g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+				if(computerImage3.getWidth( null )==-1)
+				{
+					computerImage3 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandmaGirl.png");
+				}
+			}
+			else if(player1 == 4){
+				g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+				if(computerImage4.getWidth( null )==-1)
+				{
+					computerImage4 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childBoy.png");
+				}
+			}
+			else if(player1 == 5){
+				g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+				if(computerImage5.getWidth( null )==-1)
+				{
+					computerImage5 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultBoy.png");
+				}
+			}
+			else if(player1 == 6){
+				g.drawImage(computerImage1, 955, 265, (int)(220.*sX),(int)( 220.*sY), null);
+				if(computerImage6.getWidth( null )==-1)
+				{
+					computerImage6 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandpaBoy.png");
+				}
+			}
+			
+			// *************************************************************************************************
+			//Player 2
+				if(player2 == 1){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage1.getWidth( null )==-1)
+					{
+						computerImage1 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childGirl.png");
+					}
+				}
+				else if(player2 == 2){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage2.getWidth( null )==-1)
+					{
+						computerImage2 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultGirl.png");
+					}
+				}
+				else if(player2 == 3){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage3.getWidth( null )==-1)
+					{
+						computerImage3 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandmaGirl.png");
+					}
+				}
+				else if(player2 == 4){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage4.getWidth( null )==-1)
+					{
+						computerImage4 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/childBoy.png");
+					}
+				}
+				else if(player2 == 5){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage5.getWidth( null )==-1)
+					{
+						computerImage5 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/adultBoy.png");
+					}
+				}
+				else if(player2 == 6){
+					g.drawImage(computerImage1, 955, 660, (int)(220.*sX),(int)( 220.*sY), null);
+					if(computerImage6.getWidth( null )==-1)
+					{
+						computerImage6 = Toolkit.getDefaultToolkit().getImage("src/GUI/images/grandpaBoy.png");
+					}
+				}
+		}		
+		
+		//Draws the winner Screen;
+		if(showWinnerScreen == true){
+			removeAll();
+			g.drawImage(winnerScreen, 0, 0, (int)(1280.*sX),(int)( 1024.*sY), null);
+			if(winnerScreen.getWidth( null )==-1)
+			{
+				winnerScreen = Toolkit.getDefaultToolkit().getImage("src/GUI/images/winnerScreen.png");
+			}
+			winnerScreen();
+		}	
+		super.paintComponents(g);
+	}
+	
+	public void setBoardSize(){
+		Font font1 = new Font("SansSerif", Font.PLAIN, 40);
+		if(!drawOnce[2]){
+			drawOnce[2]=true;
+		    size = new JLabel();
+		    size.setText("Set Board size: ");
+		    size.setFont(new Font("Courier", Font.BOLD, 30));
+		    size.setForeground(Color.black);
+		    size.setBounds(10, 805, 288, 50);
+		    Resize(size);
+			add(size);	
+			
+			inputFieldx = new TextField();
+			inputFieldx.setBounds(300, 805, 100, 50);
+			inputFieldx.setFont(font1);
+			Resize(inputFieldx);
+		//Resize(inputFieldx);
+			add(inputFieldx);	 	
+			
+		    size = new JLabel();
+		    size.setText("by");
+		    size.setFont(new Font("Courier", Font.BOLD, 30));
+		    size.setForeground(Color.black);
+		    size.setBounds(407, 805, 40, 50);
+		    Resize(size);
+			add(size);
+			
+			inputFieldy = new TextField(); 
+			inputFieldy.setBounds(450, 805, 100, 50);
+			inputFieldy.setFont(font1);
+			Resize(inputFieldy);
+		//Resize(inputFieldy);
+			add(inputFieldy); 
+				
+			createButton = new MyJButton("Create"); 
+			createButton.setBounds(570,805, 200, 50);
+			createButton.setFont(new Font("Courier", Font.PLAIN, 25));
+			createButton.setBackground(Color.orange);
+			Resize(createButton);
+			add(createButton); 	
+			
+			flipItButton = new MyJButton("Flip it"); 
+			flipItButton.setBounds(90,870, 300, 125);
+			flipItButton.setFont(new Font("Courier", Font.PLAIN, 30));
+			flipItButton.setBackground(Color.green);
+			Resize(flipItButton);
+			add(flipItButton); 
+			
+			deleteButton = new MyJButton("Remove Piece"); 
+			deleteButton.setBounds(410, 870,300, 125);
+			deleteButton.setFont(new Font("Courier", Font.PLAIN, 30));
+			deleteButton.setBackground(Color.green);
+			Resize(deleteButton);
+			add(deleteButton); 
+		
+			setVisible(true); 
+		}	
+		createButton.addActionListener(this);
+		flipItButton.addActionListener(this);
+		deleteButton.addActionListener(this);
+		
+	}
+	public void updated()
+	{
+		updated=true;
+		gr.updated();
+	}
+	
+	public void highScoreSection(){
+			if(numberOfPlayers == 1){
+				if(!drawOnce[3]){
+					drawOnce[3]=true;
+					name = new JLabel();
+					name.setText("Name:");
+					name.setFont(new Font("Courier", Font.BOLD, 27));
+					name.setForeground(Color.black);
+					name.setBounds(950, 200, 100, 100);
+					Resize(name);
+					add(name);
+					
+					firstName = new JLabel();
+					firstName.setFont(new Font("Courier", Font.BOLD, 27));
+					firstName.setForeground(Color.black);
+					firstName.setBounds(1030, 200, 100, 100);
+					Resize(firstName);
+					add(firstName);
+				}
+			}
+			else if(numberOfPlayers == 2){
+				if(!drawOnce[3]){
+					drawOnce[3]=true;
+					//Player 1's information
+					name = new JLabel();
+					name.setText("Name:");
+					name.setFont(new Font("Courier", Font.BOLD, 27));
+					name.setForeground(Color.black);
+					name.setBounds(950, 200, 100, 100);
+					Resize(name);
+					add(name);
+
+					firstName = new JLabel();
+					firstName.setFont(new Font("Courier", Font.BOLD, 27));
+					firstName.setForeground(Color.black);
+					firstName.setBounds(1030, 200, 100, 100);
+					Resize(firstName);
+					add(firstName);
+					//Players 2 Information
+					name = new JLabel();
+					name.setText("Name:");
+					name.setFont(new Font("Courier", Font.BOLD, 27));
+					name.setForeground(Color.black);
+					name.setBounds(950, 595, 100, 100);
+					Resize(name);
+					add(name);
+									
+					secondName = new JLabel();
+					secondName.setText(firstPlayer2);
+					secondName.setFont(new Font("Courier", Font.BOLD, 27));
+					secondName.setForeground(Color.black);
+					secondName.setBounds(1030, 595, 100, 100);
+					Resize(secondName);
+					add(secondName);
+				}
+			}	
+
+			if(!drawOnce[4]){
+				drawOnce[4]=true;	
+
+/*	We're not doing a high score system	
+			//Score for player 1
+			score = new JLabel();
+		    score.setText("Score:");
+		    score.setFont(new Font("Courier", Font.BOLD, 27));
+		    score.setForeground(Color.black);
+		    score.setBounds(970, 450, 100, 100);
+		    Resize(score);
+			add(score);
+			
+			//Score for player 2
+		    score = new JLabel();
+		    score.setText("Score:");
+		    score.setFont(new Font("Courier", Font.BOLD, 27));
+		    score.setForeground(Color.black);
+		    score.setBounds(970, 820, 100, 150);
+		    Resize(score);
+			add(score);
+*/	
+		}
+	}
+	
+	public void winnerScreen(){
+		//Display winner screen
+		if(showWinnerScreen = true){
+				//add 2 buttons : play Again & Quit
+			    int winner = 0;
+				if(winner == 0){
+					winner1 = "Player 1 won!";
+				}
+				else if(winner == 2){
+					winner1 = "Player 2 won!";
+				}
+				else if(winner == 3){
+					winner1 = "Computer won!";
+				}
+				
+				winnerLabel = new JLabel();
+			    winnerLabel.setText(winner1);
+				winnerLabel.setFont(new Font("Courier", Font.BOLD, 55));
+				winnerLabel.setForeground(Color.white);
+				winnerLabel.setBounds(405, 370, 500, 150);
+				Resize(winnerLabel);
+				add(winnerLabel);
+				
+				
+				playAgainButton = new MyJButton("Play Again"); 
+				playAgainButton.setBounds(420,500, 200, 75);
+				playAgainButton.setFont(new Font("Courier", Font.PLAIN, 25));
+				playAgainButton.setBackground(Color.green);
+				Resize(playAgainButton);
+				add(playAgainButton); 
+				
+				quitButton = new MyJButton("Quit"); 
+				quitButton.setBounds(620,500, 200, 75);
+				quitButton.setFont(new Font("Courier", Font.PLAIN, 25));
+				quitButton.setBackground(Color.green);
+				Resize(quitButton);
+				add(quitButton); 
+				
+				playAgainButton.addActionListener(this);
+				quitButton.addActionListener(this);
+		}
+	}
+	
+	public void actionPerformed(ActionEvent arg0)
+	{
+		String command=arg0.getActionCommand();
+		
+		if(command.equals("Create"))
+		{	
+			int x = Integer.parseInt(inputFieldx.getText());
+			int y = Integer.parseInt(inputFieldy.getText());
+			changeDimensions((int)(800.*sX),(int)(800.*sY),x,y,true);
+		}
+		
+		if(command.equals("Flip it"))
+		{
+			System.out.println("Flip Board here");
+			//Flip board
+			GameEngine.flipGrid();
+		}
+		
+		if(command.equals("Remove Piece"))
+		{
+			System.out.println("Remove Piece here");
+		}
+		//This will start the game
+		if(command.equals("Play Again"))
+		{
+			MainFrame.thisFrame.start();
+		}
+		
+		if(command.equals("Quit"))
+		{
+			System.exit(-1);
+		}
+	}
+
+	public Grid getGrid()
+	{
+		return gr;
+	}
+	public void changeDimensions(int totalWidth,int totalHeight,int boxWidth,int boxHeight,boolean rows)
+	{
+		GameEngine.resetBoard();
+		gr.resize(totalWidth, totalHeight, boxWidth, boxHeight, rows);
+	}
+	public void setGrid(Grid gr)
+	{
+		this.gr = gr;
+	}
+	public Rectangle scale(Rectangle r)
+	{
+		return new Rectangle((int)(r.getX()*sX),(int)(r.getY()*sY),(int)(r.getWidth()*sX),(int)(r.getHeight()*sY));
+	}
+	public void Resize(JComponent j)
+	{
+		j.setBounds(scale(j.getBounds()));
+	}
+	public void Resize(Component j)
+	{
+		j.setBounds(scale(j.getBounds()));
+	}
+}

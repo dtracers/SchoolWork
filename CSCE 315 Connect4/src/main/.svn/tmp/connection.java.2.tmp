@@ -1,0 +1,205 @@
+package main;
+
+
+import gameplay.GameEngine;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Timer;
+
+import GUI.Display;
+<<<<<<< .mine
+import GUI.MainFrame;
+import brains.Move;
+=======
+import GUI.MainFrame;
+>>>>>>> .r115
+
+
+public class connection {
+	
+	private Socket c_socket = null;	 //clientServer
+	InputStream input;
+	OutputStream output;
+	boolean connection;
+	private BufferedReader buff;
+	Display d;
+	Move previous;
+
+	public connection(String connectionName, int connectionNumber){
+		try {
+			//you can use "linux.cs.tamu.edu" in connectionName to run it on 2 different computers or use java by using "localhost"
+				System.out.println("Hi there! ");
+				c_socket = new Socket(connectionName, connectionNumber);
+				System.out.println("WORKS");
+				buff = new BufferedReader(new InputStreamReader(c_socket.getInputStream()));
+				System.out.println("client reads: " + read());	//reads WELCOME
+				//System.out.println("client reads: " + read());	
+				String[] information = read().split(" ");	//reads Information & parses it
+				
+				write("READY");	//sends READY
+				System.out.println("client reads: " + read());	//reads BEGIN
+			
+				String info;
+				int _row;
+				int _column;
+				String _move;
+				int _time;
+				String _entry;
+		
+				info = information[0];
+				_row = Integer.parseInt(information[1]);
+				_column = Integer.parseInt(information[2]);
+				_move = information[3];
+				_time = Integer.parseInt(information[4]);
+				_entry = information[5];
+				
+				int type = 0;
+				
+				if(_move.toLowerCase().equals("f")){
+					type = 1;
+				}
+				else if(_move.toLowerCase().equals("s")){
+					type = 2;
+				}
+				
+				if(_entry.toLowerCase().equals("f")){	//start game allow flips with row & columns & specify whether first or second
+		//			GameEngine i = new GameEngine();	
+					GameEngine i=MainFrame.thisFrame.i;
+					//i.setMyPieceType(type);
+					i.setGridLengths(_row, _column);
+					i.setTime(_time);
+					MainFrame.thisFrame.getDisplay().flipsOnly();
+					i.start();
+					if(type == 1){
+						startReading();
+					}
+					else{
+						read();
+					}
+					System.out.println('f');					
+				}
+				else if(_entry.toLowerCase().equals("r")){	//start game allow removals only with row & columns & specify whether first or second
+					GameEngine i=MainFrame.thisFrame.i;
+					//i.setMyPieceType(type);
+					i.setGridLengths(_row, _column);
+					i.setTime(_time);
+					MainFrame.thisFrame.getDisplay().deleteOnly();
+					i.start();
+					if(type == 1){
+						startReading();
+					}
+					else{
+						read();
+					}
+					System.out.println('r');	
+				}		
+				else if(_entry.toLowerCase().equals("b")){	//start game allow both with row & columns & specify whether first or second
+					GameEngine i=MainFrame.thisFrame.i;
+					i.setMyPieceType(type);
+					i.setGridLengths(_row, _column);
+					i.setTime(_time);
+					MainFrame.thisFrame.getDisplay().allowBoth();
+					i.start();
+					if(type == 1){
+						startReading();
+					}
+					else{
+						read();
+					}
+					System.out.println('b');
+				}
+				else if(_entry.toLowerCase().equals("n")){	// 	start game allow neither with row & columns & specify whether first or second
+					GameEngine i=MainFrame.thisFrame.i;
+					i.setMyPieceType(type);
+					i.setGridLengths(_row, _column);
+					i.setTime(_time);
+					MainFrame.thisFrame.getDisplay().allowNeither();
+					i.start();
+					if(type == 1){
+						startReading();
+					}
+					else{
+						read();
+					}
+					System.out.println('n');
+				}	
+	
+			} 
+			catch (UnknownHostException e) {System.err.println("Connection UnknownHost Exception: " + e); System.exit(1);} 
+			catch(IOException e){System.err.println("Connection IOException: " + e);System.exit(1);}
+	}
+	
+	public void startReading()
+	{
+		while(true)
+		{
+			Move m=GameEngine.getPreviousMove();
+			if((previous!=m)&&m!=null&&!m.equals(previous))
+			{
+				//send Move!
+				//read next move
+				m.sendMove();
+				read();
+			}
+		}
+	}
+	
+	public void getMove(){
+		String read = read();
+		Move m = GameEngine.getPreviousMove();
+		m.getMove(read);
+		write("Ok");
+		write(m.sendMove());
+		
+	}
+	public String read(){
+		try {
+			String start = buff.readLine();
+			return start;
+		} 
+		catch (UnknownHostException e) {System.err.println("Connection read() UnknownHostException: " + e); System.exit(1);} 
+		catch(IOException e){System.err.println("Connection read() IOException: " + e);}
+		catch (Exception e){System.err.println("Connection read() Exception Error: " + e);	System.exit(1);}
+		return null;
+	}
+	
+	public void closeConnection(){
+		try {
+			c_socket.close();
+		} 
+		catch (UnknownHostException e) {System.err.println("Connectoin closeConnection() UnknownHost Exception: " + e); System.exit(1);} 
+		catch (IOException e) {e.printStackTrace();}
+		catch (Exception e){System.err.println("Connectoin closeConnection() Exception Error: " + e);	System.exit(1);}
+	}
+	
+	public void insert(char _char){
+		insert(_char, 0);
+	}
+	
+	public void insert(char _char, int number){
+		if(_char == 'f'){
+			write(_char + "");
+		}
+		else if (_char == 'r' || _char == 'd'){
+			write(_char + " " + number);
+		}
+	}
+	
+	public void write(String _string){
+		try {	
+			OutputStream sockOutput = c_socket.getOutputStream();
+			PrintStream m=new PrintStream(sockOutput);
+			m.println(_string);	
+		} 
+		catch (UnknownHostException e) {System.err.println("Connection write() UnknownHost Exception: "+ e); System.exit(1);} 
+		catch(IOException e){System.err.println("Connection write() IOException Exception: " + e );}
+		catch (Exception e){System.err.println("Connection write() Exception error: " + e);	System.exit(1);}
+	}
+}

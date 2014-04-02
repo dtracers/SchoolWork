@@ -1,0 +1,199 @@
+package GUI;
+
+import gameplay.GameEngine;
+
+import java.awt.DisplayMode;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+public class MainFrame extends JFrame implements ActionListener
+{
+	boolean started = true;
+	static MainFrame thisFrame;
+	Display d;
+	Menu m;
+	ScreenManager screen;
+	Displaymodes display;
+	Rectangle bounds;
+	Rectangle fullBounds;
+	double scaleX,scaleY;
+	/**
+	 * Create the frame.
+	 */
+	public MainFrame()
+	{
+		try
+		{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		display = new Displaymodes();
+		thisFrame=this;
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//	setBounds(100, 100, 1000, 1000);
+		
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+		
+		JMenuItem mntmSave = new JMenuItem("New Game");
+		mntmSave.addActionListener(this);
+		//adding this as an action listener means that if an action happens
+		//this will handle it
+		mnFile.add(mntmSave);
+		mnFile.addSeparator();
+		
+/*		JMenuItem mntmLoad = new JMenuItem("Change Size");
+		
+		mntmLoad.addActionListener(this);
+		mnFile.add(mntmLoad);
+*/
+
+		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.addActionListener(this);
+		mnFile.add(mntmQuit);
+
+		/*
+		JMenu mnOptions = new JMenu("Options");
+		menuBar.add(mnOptions);	
+		*/
+		
+		JMenu mnDebug = new JMenu("Debug");
+		menuBar.add(mnDebug);
+		
+		JMenuItem mntmAI = new JMenuItem("AI MOVE");
+		mntmAI.addActionListener(this);
+		mnDebug.add(mntmAI);
+		
+		init();
+		d=new Display();
+		if(started)
+		{
+			this.addMouseListener(d.getGrid());
+			this.addKeyListener(d.getGrid());
+			add(d);
+			//addMenu();
+		}else
+		{
+			addMenu();
+		}
+	}
+
+	 public void init()
+    {
+		bounds=new Rectangle(100,100,1100,1100);
+        screen = new ScreenManager();
+        DisplayMode displaymode = screen.findFirstCompatibleMode(ScreenModes.transfer(ScreenModes.ALL_MODES));
+        screen.setFullScreen(displaymode, this);
+        fullBounds=new Rectangle(this.getBounds());
+        System.out.println("fullbounds are: "+fullBounds);
+        System.out.println("reg bounds are: "+bounds);
+        scaleX=fullBounds.getWidth()/bounds.getWidth();
+        scaleY=fullBounds.getHeight()/bounds.getWidth();
+        System.out.println("scae x "+scaleX+" scae y "+scaleY);
+    }
+	/**
+	 * If a menu item is clicked and it has this class as an actionListener
+	 * then this method is called
+	 * command for a JMenuItem is the name of the JMenuItem
+	 */
+	@Override
+	public void actionPerformed(ActionEvent arg0)
+	{
+		String command=arg0.getActionCommand();
+		if(command.equals("AI MOVE"))
+		{
+			GameEngine.makeAiMove();
+		}
+		
+		if(command.equals("New Game"))
+		{
+			if(d != null){
+				remove(d);
+			}
+			remove(d);
+			if(m != null){
+				remove(m);
+			}
+
+			addMenu();
+		/*	
+			MainFrame frame = new MainFrame();
+			frame.setSize (1000, 1000);
+			frame.setLocation (0, 0);  
+			
+			m = new Menu();
+			frame.add(m);
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			
+		}
+		*/
+		}
+
+		if(command.equalsIgnoreCase("Quit"))
+		{
+			System.exit(0);
+		}
+
+		
+		System.out.println("ACTIONED");
+		//System.out.println(arg0.getActionCommand());
+		
+	}
+
+
+	public void start()
+	{
+		//if(started)
+		//{
+		
+		if(m != null){
+			remove(m);
+		}
+		remove(m);
+		if(d != null){
+			remove(d);
+		}
+		
+			this.addMouseListener(d.getGrid());
+			add(d);
+			//started=true;
+		//}
+	}
+	//I didn't use the addMenu() function
+	public void addMenu()
+	{
+		if(started)
+		{
+			m = new Menu(scaleX,scaleY);
+				add(m);
+			started=false;
+		}
+	}
+	
+	public void switchPanel(JPanel ret,Menu m)
+	{
+		if(ret!=null)
+		{
+			System.out.println("Switching panel");
+//			if(m.getCurrentPanel()!=null)
+//			this.remove(m.getCurrentPanel());
+//			this.add(ret);
+			this.setContentPane(ret);
+	//		m.setCurrentPanel(ret);
+		}
+	}
+}

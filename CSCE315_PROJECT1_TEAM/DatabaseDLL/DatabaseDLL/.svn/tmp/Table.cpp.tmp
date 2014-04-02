@@ -1,0 +1,199 @@
+#include "Table.h"
+
+//Table Constructor
+Table::Table(string name)
+{
+	Table::tableName = name;
+}
+
+Table::~Table(void)
+{
+}
+
+
+string Table::getTableName(){
+	return tableName;
+}
+
+int Table::rowCount() {
+	if(columnCount() > 0){
+		return columnList.begin()->second->rowCount();
+	}
+	else{
+		return 0;
+	}
+}
+
+int Table::columnCount() {
+	return columnList.size();
+}
+
+Column * Table::findColumn(string colName) {
+	return columnList[colName];
+}
+
+void Table::setPrimaryKey(string colName) {
+	
+	Column *theCol = findColumn(colName);
+
+	if(theCol == NULL) {
+		throw DatabaseException(20, colName + " does not exist.");
+	}
+
+	theCol->setPrimary(true);
+}
+
+void Table::createColumn(string passInName,Column* col)
+{
+	string type=col->getColumnType();
+	if(type=="varchar")
+	{
+		stringstream m;
+		m<<col->getVarCharMaxLength();
+		string m2;
+		m>>m2;
+		m2="("+m2+")";
+		type+=m2;
+	}
+	createColumn(passInName,type);
+}
+
+void Table::createColumn(string passInName, string passInType) {
+	if(findColumn(passInName) != NULL) {
+		throw DatabaseException(21, passInName + " already exists.");
+	}
+
+	columnList[passInName] = new Column(passInType);
+}
+
+void Table::addRow(vector<string> columnNames, vector<string> rowData) {
+	for(int i = 0; i < columnNames.size(); i++) {
+		Column *thisCol = findColumn(columnNames[i]);
+		if(thisCol == NULL) {
+			throw DatabaseException(20, "Column " + columnNames[i] + " does not exist.");
+		}
+		if(thisCol->isPrimaryKey() && thisCol->valExists(rowData[i])) {
+			throw DatabaseException(22, rowData[i] + " already exists in column" + columnNames[i] + ".");
+		}
+
+		thisCol->addRow(rowData[i]);
+	}
+}
+
+void Table::deleteAllRows(){
+	map<string,Column*>::iterator it;
+	it = it=columnList.begin();
+	columnList.erase ( it, columnList.end() );
+}
+
+void Table::deleteRow(int rowIndex) { //ADDED
+	if(rowIndex > rowCount()) {
+		throw DatabaseException(23, rowIndex + " out of range.");
+	}
+
+	map<string, Column *>::iterator columnIt;
+	
+	for (columnIt = columnList.begin() ; columnIt != columnList.end(); columnIt++) {
+		columnIt->second->deleteRow(rowIndex);
+	}
+}
+
+void Table::updateRow(int rowIndex, vector<string> columnNames, vector<string> rowData) {
+	if(rowIndex > rowCount()) {
+		throw DatabaseException(23, rowIndex + " out of range.");
+	}
+
+	//Loop through the columns and change the values at the index if the column exists.
+	for(int i = 0; i < columnNames.size(); i++) {
+		if(columnList[columnNames[i]] == NULL) {
+			throw DatabaseException(20, columnNames[i] + " does not exist.");
+		}
+
+		columnList[columnNames[i]]->addRow(rowData[i], rowIndex);
+	}
+}
+
+string Table::printColumns(){
+	string s = "";
+	map<string, Column *>::iterator it;
+	
+	for (it=columnList.begin() ; it != columnList.end(); it++){
+		s += it->first;
+		s += it->second->printDataList();
+		s += ";\n";
+	}
+	
+	return s;
+}
+
+string Table::printSelf(){
+
+	ostringstream stringForConversion;
+	ostringstream stringForConversion2;
+
+	string s = getTableName() + ", ";
+
+	stringForConversion << columnCount();
+	s += "Columns: "+stringForConversion.str() + ", ";
+	
+	stringForConversion2 << rowCount();
+	s += "Rows: "+stringForConversion2.str() + ";\n";
+	
+	s += printColumns();
+	cout<<s<<endl;
+	return s;
+}
+
+vector<string> Table::getRow(int rowIndex) {
+
+	vector<string> returnVect;
+
+	map<string, Column *>::iterator it;
+	for ( it=columnList.begin() ; it != columnList.end(); it++ ) {
+		returnVect.push_back(it->second->getValueAtRowIndex(rowIndex));
+	}
+
+	return returnVect;
+}
+
+vector<string> Table::columnNames() {
+	
+	vector<string> returnVect;
+
+	map<string, Column *>::iterator columnIt;
+	for(columnIt = columnList.begin(); columnIt != columnList.end(); columnIt++) {
+		returnVect.push_back(columnIt->first);
+	}
+
+	return returnVect;
+}
+
+
+void Table::combineTables(Table* table1,Table* table2,string table1col,string table2col)
+{
+	vector<string> column1=table1->columnNames();
+	vector<string> column2=table2->columnNames();
+	vector<string> Same;
+	for(int k=0;k<column1.size();k++)
+	{
+		string name=column1[k];
+		if(findColumn(name)==NULL)
+		{
+			createColumn(name,table1->findColumn(name));
+		}else
+		{
+			//huh?
+		}
+	}
+	for(int k=0;k<column2.size();k++)
+	{
+		string name=column2[k];
+		if(findColumn(name)==NULL)
+		{
+			createColumn(name,table1->findColumn(name));
+		}else
+		{
+			Same.putback();
+		}
+	}
+}

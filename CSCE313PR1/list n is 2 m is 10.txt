@@ -1,0 +1,20 @@
+Iteration 0
+Result of ackerman(2, 10): 23
+ sec = 0, musec = 290
+Number of allocate/free cycles: 275
+
+Iteration 1
+Result of ackerman(2, 10): 23
+ sec = 0, musec = 279
+Number of allocate/free cycles: 275
+
+Iteration 2
+Result of ackerman(2, 10): 23
+ sec = 0, musec = 332
+Number of allocate/free cycles: 275
+
+Iteration 3
+Result of ackerman(2, 10): 23
+ sec = 0, musec = 267
+Number of allocate/free cycles: 275
+

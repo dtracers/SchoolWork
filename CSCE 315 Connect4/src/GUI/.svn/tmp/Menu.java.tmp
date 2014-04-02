@@ -1,0 +1,863 @@
+package GUI;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+
+
+class Menu extends MyButtonPanel implements ActionListener {
+	Display d;
+	Menu m;
+	
+	private static final int FRAME_WIDTH = 1000;
+	private static final int FRAME_HEIGHT = 1000;
+	private static final int FRAME_X_ORIGIN = 0;
+	private static final int FRAME_Y_ORIGIN = 0;
+    private static final int PLAYER_BUTTON_WIDTH = 220;
+    private static final int PLAYER_BUTTON_HEIGHT = 220;
+    private static final int BUTTON_HEIGHT = 100;
+    private static final int BUTTON_WIDTH = 300;
+
+	
+//***** Back button and start button possibly need to be lower **** ///
+//I'll fix that	later when I have a bigger screen
+    private static final int STARTING_BUTTON_lEFT_RIGHT= 357;
+    private static final int STARTING_BUTTON_UP_DOWN = 830;
+    private static final int MENU_BUTTON_WIDTH = 600;
+    private static final int MENU_BUTTON_HEIGHT = 150;
+    private static final int STARTING_HEIGHT = 200;
+    
+    private Image backgroundImage = null;
+    int playerOption = 0;
+    int numberOfPlayers = 0;
+	
+	private MyJButton startButton;
+	private MyJButton playerButton;
+	private MyJButton computerButton;
+	private MyJButton instructionButton;
+	private MyJButton highScoreButton;
+	private MyJButton girlButton;
+	private MyJButton womanButton;
+	private MyJButton grandmaButton;
+	private MyJButton boyButton;
+	private MyJButton menButton;
+	private MyJButton grandpaButton;
+	private MyJButton backButton;
+	private MyJButton playButton;
+	private MyJButton nextButton;
+	
+	private MyJButton dummyButton;
+	private MyJButton easyButton;
+	private MyJButton moderateButton;
+	private MyJButton perfectButton;
+	
+	private JLabel image;
+	private JLabel prompt;
+	private JLabel changePlayer;
+
+	private JTextField playerName1;
+	private JTextField playerName2;	
+	
+	private JPanel currentPanel;
+	Color coolOrange = new Color(242, 161, 33);
+	Color connectBlue = new Color(0, 128, 255);
+	
+	Image backgroundImageStart = this.loadImage("images/startScreen.png");
+	Image backgroundImageOptions = this.loadImage("images/menu.png");
+	Image backgroundImageInstructions = this.loadImage("images/instructionsScreen.png");
+	Image backgroundImagePlayer1 = this.loadImage("images/player1.png");
+	Image backgroundImagePlayer2 = this.loadImage("images/player2.png");
+	Image backgroundImageHighScore = this.loadImage("images/highScoresScreen.png");
+	Image backgroundImageSelectLevel= this.loadImage("images/selectLevel.png");
+	
+	public Menu(){
+// Background image is called "startScreen.png"
+//		setTitle("Connect 4");
+//		setSize (FRAME_WIDTH, FRAME_HEIGHT);
+//		setLocation (FRAME_X_ORIGIN, FRAME_Y_ORIGIN);    
+		setSize( 1000, 1000 );
+		this.backgroundImage = backgroundImageStart;
+		
+		startButton = new MyJButton("New Game");
+		startButton.setFont(new Font("Courier", Font.BOLD, 50));
+		startButton.setBackground(coolOrange);
+		startButton.setBounds( STARTING_BUTTON_lEFT_RIGHT, STARTING_BUTTON_UP_DOWN, BUTTON_WIDTH, BUTTON_HEIGHT);
+		
+		//startButton.setAction("OptionMenu", this.getClass(),this);
+		add(startButton);
+		
+		startButton.addActionListener(this);
+		this.currentPanel = this;
+	}	
+
+	private Image loadImage (String pad){
+        return Toolkit.getDefaultToolkit().getImage(getClass().getResource(pad));
+    }
+
+	public JPanel optionMenu(){
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;
+		
+		instructionButton = new MyJButton("images/instructions.png",STARTING_HEIGHT, 90, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+		instructionButton.setAction("instructions", this.getClass(),this);
+		addMyButton(instructionButton,false);
+		
+		playerButton = new MyJButton("images/playerVsPlayer.png",STARTING_HEIGHT, 242, MENU_BUTTON_WIDTH, 260);
+		playerButton.setAction("playerVsPlayer", this.getClass(),this);
+		addMyButton(playerButton,false);
+		
+		computerButton = new MyJButton("images/playerVsComputer.png",STARTING_HEIGHT, 504, MENU_BUTTON_WIDTH, 260);
+		computerButton.setAction("playerVsComputer", this.getClass(),this);
+		addMyButton(computerButton,false);
+		
+		highScoreButton = new MyJButton("images/highScores.png",STARTING_HEIGHT, 766, MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT);
+		highScoreButton.setAction("highScore", this.getClass(),this);
+		addMyButton(highScoreButton,false);
+		
+		this.addMouseListener(playerButton);
+		this.addMouseListener(computerButton);
+		this.addMouseListener(highScoreButton);
+		this.addMouseListener(instructionButton);
+		System.out.println("BUTTON!!!");
+		return null;
+	}
+	
+	public void playerVsComputer(){
+		numberOfPlayers = 1;
+		playerOption1();
+	}
+	
+	public void playerVsPlayer(){
+		numberOfPlayers = 2;
+		playerOption1();
+	}
+	
+	public JPanel playerOption1(){
+//Background image is called "player1.png" 
+		this.removeAllButtons();
+		//removeAll();
+		this.backgroundImage = backgroundImagePlayer1;		
+		
+		JPanel contentPane = new JPanel();
+		contentPane.setLayout(null);
+	
+		//image is called "childGirl.png"
+		girlButton = new MyJButton("images/childGirl.png", 170, 350, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		girlButton.setAction("player1Number1", this.getClass(),this);
+		addMyButton(girlButton,false);
+		
+		womanButton = new MyJButton("images/adultGirl.png", 390,350, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		womanButton.setAction("player1Number2", this.getClass(),this);
+		addMyButton(womanButton,false);
+		
+		grandmaButton = new MyJButton("images/grandmaGirl.png", 610,350, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandmaButton.setAction("player1Number3", this.getClass(),this);
+		addMyButton(grandmaButton,false);
+		
+		boyButton = new MyJButton("images/childBoy.png", 170,570, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		boyButton.setAction("player1Number4", this.getClass(),this);
+		addMyButton(boyButton,false);
+		
+		menButton = new MyJButton("images/adultBoy.png", 390,570, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		menButton.setAction("player1Number5", this.getClass(),this);
+		addMyButton(menButton,false);
+
+		grandpaButton = new MyJButton("images/grandpaBoy.png", 610,570, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandpaButton.setAction("player1Number6", this.getClass(),this);
+		addMyButton(grandpaButton,false);	
+		
+		this.addMouseListener(girlButton);
+		this.addMouseListener(womanButton);
+		this.addMouseListener(grandmaButton);
+		this.addMouseListener(boyButton);
+		this.addMouseListener(menButton);
+		this.addMouseListener(grandpaButton);
+		
+		System.out.println(numberOfPlayers);
+		
+		//return contentPane;
+		return null;
+	}
+	
+	public void player1Number1(){
+		System.out.println("dafdas"+numberOfPlayers);
+		playerOption = 1;
+		player1();
+	}
+	
+	public void player1Number2(){
+		System.out.println(numberOfPlayers);
+		playerOption = 2;
+		player1();
+	}
+	
+	public void player1Number3(){
+		System.out.println(numberOfPlayers);
+		playerOption = 3;
+		player1();
+	}
+	
+	public void player1Number4(){
+		System.out.println("dafdas"+numberOfPlayers);
+		playerOption = 4;
+		player1();
+	}
+	
+	public void player1Number5(){
+		System.out.println(numberOfPlayers);
+		playerOption = 5;
+		player1();
+	}
+	
+	public void player1Number6(){
+		System.out.println(numberOfPlayers);
+		playerOption = 6;
+		player1();
+	}
+	
+	public JPanel playerOption2(){
+//Background image is called "player2.png"
+		this.removeAllButtons();
+		this.removeAll();
+		this.backgroundImage = backgroundImagePlayer2;		
+		
+		JPanel contentPane = new JPanel();
+		contentPane.setLayout(null);
+	
+		girlButton = new MyJButton("images/childGirl.png", 170, 350, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		girlButton.setAction("player2Number1", this.getClass(),this);
+		addMyButton(girlButton,false);
+		
+		womanButton = new MyJButton("images/adultGirl.png", 390,350, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		womanButton.setAction("player2Number2", this.getClass(),this);
+		addMyButton(womanButton,false);
+		
+		grandmaButton = new MyJButton("images/grandmaGirl.png", 610,350, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandmaButton.setAction("player2Number3", this.getClass(),this);
+		addMyButton(grandmaButton,false);
+		
+		boyButton = new MyJButton("images/childBoy.png", 170,570, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		boyButton.setAction("player2Number4", this.getClass(),this);
+		addMyButton(boyButton,false);
+		
+		menButton = new MyJButton("images/adultBoy.png", 390,570, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		menButton.setAction("player2Number5", this.getClass(),this);
+		addMyButton(menButton,false);
+
+		grandpaButton = new MyJButton("images/grandpaBoy.png", 610,570, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+		grandpaButton.setAction("player2Number6", this.getClass(),this);
+		addMyButton(grandpaButton,false);	
+		
+		this.addMouseListener(girlButton);
+		this.addMouseListener(womanButton);
+		this.addMouseListener(grandmaButton);
+		this.addMouseListener(boyButton);
+		this.addMouseListener(menButton);
+		this.addMouseListener(grandpaButton);
+		
+		//return contentPane;
+		return null;
+	}
+	
+	public void player2Number1(){
+		playerOption = 1;
+		player2();
+	}
+	
+	public void player2Number2(){
+		playerOption = 2;
+		player2();
+	}
+	
+	public void player2Number3(){
+		playerOption = 3;
+		player2();
+	}
+	
+	public void player2Number4(){
+		playerOption = 4;
+		player2();
+	}
+	
+	public void player2Number5(){
+		playerOption = 5;
+		player2();
+	}
+	
+	public void player2Number6(){
+		playerOption = 6;
+		player2();
+	}
+	
+	public JPanel instructions(){
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageInstructions;		
+		
+		//removeAllButtons();//IMPORTANT alsways at tio
+		System.out.println("INSTRUCTIONS");
+		
+		backButton = new MyJButton("images/back.png",//copied from image icon
+				STARTING_BUTTON_lEFT_RIGHT, STARTING_BUTTON_UP_DOWN, BUTTON_WIDTH, BUTTON_HEIGHT);//copied from set bounds
+		addMyButton(backButton,false);
+		backButton.setAction("optionMenu", this.getClass(), this);//method name of next method
+		this.addMouseListener(backButton);//IMPORTANT
+		
+		return null;
+	}
+	
+	
+	public JPanel highScore(){
+// Background image is called "highScoresScreen.png"
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageHighScore;		
+		
+		JPanel contentPane = new JPanel();
+		contentPane.setLayout(null);
+		
+		backButton = new MyJButton("images/back.png",//copied from image icon
+				STARTING_BUTTON_lEFT_RIGHT, STARTING_BUTTON_UP_DOWN, BUTTON_WIDTH, BUTTON_HEIGHT);//copied from set bounds
+		addMyButton(backButton,false);
+		backButton.setAction("optionMenu", this.getClass(), this);//method name of next method
+		this.addMouseListener(backButton);//IMPORTANT
+		return null;
+	}
+	
+	public JPanel player1(){
+// Background image is called "menu.png"
+		removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;
+		
+		System.out.println(numberOfPlayers);
+		
+	//playerOption = 1;
+		//This will decide on depending on which player they chose, it will save it
+		if(playerOption == 1){	
+			//image is called "childGirl.png"
+			girlButton = new MyJButton("images/childGirl.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+<<<<<<< .mine
+		//	girlButton.setAction("", this.getClass(),this);
+=======
+			girlButton.setAction("playerOption1", this.getClass(),this);
+>>>>>>> .r28
+			addMyButton(girlButton,false);	
+			this.addMouseListener(girlButton);//IMPORTANT
+		}
+		else if (playerOption == 2){
+			//image is called "adultGirl.png"
+			
+			womanButton = new MyJButton("images/adultGirl.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+<<<<<<< .mine
+		//	womanButton.setAction("", this.getClass(),this);
+=======
+			womanButton.setAction("playerOption1", this.getClass(),this);
+>>>>>>> .r28
+			addMyButton(womanButton,false);	
+			this.addMouseListener(womanButton);//IMPORTANT		
+		}
+		else if (playerOption == 3){
+			//image is called "grandmaGirl.png"
+			grandmaButton = new MyJButton("images/grandmaGirl.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+<<<<<<< .mine
+		//	grandmaButton.setAction("", this.getClass(),this);
+=======
+			grandmaButton.setAction("playerOption1", this.getClass(),this);
+>>>>>>> .r28
+			addMyButton(grandmaButton,false);	
+			this.addMouseListener(grandmaButton);//IMPORTANT	
+		}
+		else if (playerOption == 4){	
+			//image is called "childBoy.png"
+			boyButton = new MyJButton("images/childBoy.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+<<<<<<< .mine
+		//	boyButton.setAction("", this.getClass(),this);
+=======
+			boyButton.setAction("playerOption1", this.getClass(),this);
+>>>>>>> .r28
+			addMyButton(boyButton,false);	
+			this.addMouseListener(boyButton);//IMPORTANT	
+		}
+		else if (playerOption == 5){	
+			//image is called "adultBoy.png"
+			menButton = new MyJButton("images/adultBoy.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+<<<<<<< .mine
+		//	menButton.setAction("", this.getClass(),this);
+=======
+			menButton.setAction("playerOption1", this.getClass(),this);
+>>>>>>> .r28
+			addMyButton(menButton,false);	
+			this.addMouseListener(menButton);//IMPORTANT	
+		}
+		else if (playerOption == 6){
+			//image is called "grandpaBoy.png"
+			grandpaButton = new MyJButton("images/grandpaBoy.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+<<<<<<< .mine
+		//	grandpaButton.setAction("", this.getClass(),this);
+=======
+			grandpaButton.setAction("playerOption1", this.getClass(),this);
+>>>>>>> .r28
+			addMyButton(grandpaButton,false);	
+			this.addMouseListener(grandpaButton);//IMPORTANT
+		}
+		
+		changePlayer = new JLabel();
+		changePlayer.setText("To change your player, click on it");
+		changePlayer.setFont(new Font("Courier", Font.ITALIC, 18));
+		changePlayer.setBounds(315,85, 400, 200);
+		
+	    prompt = new JLabel();
+	    prompt.setText("Please enter Player 1's name.\n");
+	    prompt.setFont(new Font("Courier", Font.BOLD, 20));
+	    prompt.setBounds(330,350, 400, 200);
+
+		playerName1 = new JTextField();
+		playerName1.setColumns(25);
+	    playerName1.setBounds(350,480, 300, 50);
+	   
+	    add(prompt);
+		add(playerName1);
+		add(changePlayer);
+		
+	    playerName1.addActionListener(this);
+	    //numberOfPlayers = 2;
+	    System.out.println("The number is a ");
+	   System.out.println(numberOfPlayers);
+	    if(numberOfPlayers == 1){
+	    	playButton = new MyJButton("images/play.png", STARTING_BUTTON_lEFT_RIGHT, 580, BUTTON_WIDTH, BUTTON_HEIGHT);
+	    	playButton.setAction("selectLevel", this.getClass(),this);
+			addMyButton(playButton,false);
+			this.addMouseListener(playButton);//IMPORTANT
+			//return null;
+	    }
+	    //If they choose to play against another player then a next button appears
+	    else if(numberOfPlayers == 2) {
+	    	nextButton = new MyJButton("images/next.png", STARTING_BUTTON_lEFT_RIGHT, 580, BUTTON_WIDTH, BUTTON_HEIGHT);
+	    	nextButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(nextButton,false);
+			this.addMouseListener(nextButton);//IMPORTANT
+			//return null;
+	    }
+	    
+	   // setVisible(true);
+	  return null;
+	   //return contentPane;
+	}
+
+	
+	public JPanel player2(){		
+// Background image is called "menu.png"	
+		this.removeAllButtons();
+		this.backgroundImage = backgroundImageOptions;		
+		
+		JPanel contentPane = new JPanel();
+		contentPane.setLayout(null);
+		
+		//This will decide on depending on which player they chose, it will save it
+		if(playerOption == 1){	
+			//image is called "childGirl.png"
+			girlButton = new MyJButton("images/childGirl.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			girlButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(girlButton,false);	
+			this.addMouseListener(girlButton);//IMPORTANT
+		}
+		else if (playerOption == 2){
+			//image is called "adultGirl.png"
+			
+			womanButton = new MyJButton("images/adultGirl.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			womanButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(womanButton,false);	
+			this.addMouseListener(womanButton);//IMPORTANT		
+		}
+		else if (playerOption == 3){
+			//image is called "grandmaGirl.png"
+			grandmaButton = new MyJButton("images/grandmaGirl.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			grandmaButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(grandmaButton,false);	
+			this.addMouseListener(grandmaButton);//IMPORTANT	
+		}
+		else if (playerOption == 4){	
+			//image is called "childBoy.png"
+			boyButton = new MyJButton("images/childBoy.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			boyButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(boyButton,false);	
+			this.addMouseListener(boyButton);//IMPORTANT	
+		}
+		else if (playerOption == 5){	
+			//image is called "adultBoy.png"
+			menButton = new MyJButton("images/adultBoy.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			menButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(menButton,false);	
+			this.addMouseListener(menButton);//IMPORTANT	
+		}
+		else if (playerOption == 6){
+			//image is called "grandpaBoy.png"
+			grandpaButton = new MyJButton("images/grandpaBoy.png", 390, 200, PLAYER_BUTTON_WIDTH, PLAYER_BUTTON_HEIGHT);
+			grandpaButton.setAction("playerOption2", this.getClass(),this);
+			addMyButton(grandpaButton,false);	
+			this.addMouseListener(grandpaButton);//IMPORTANT
+		}
+		
+		changePlayer = new JLabel();
+		changePlayer.setText("To change your player, click on it");
+		changePlayer.setFont(new Font("Courier", Font.ITALIC, 18));
+		changePlayer.setBounds(315,85, 400, 200);
+
+	    playerName2 = new JTextField();
+	    playerName2.setColumns(25);
+	    playerName2.setBounds(350,480, 300, 50);
+	    prompt = new JLabel();
+	    prompt.setText("Please enter Player 2's name.\n");
+	    prompt.setFont(new Font("Courier", Font.BOLD, 20));
+	    prompt.setBounds(330,350, 400, 200);
+	    //prompt.setSize(122,32);
+	   
+    	playButton = new MyJButton("images/play.png", STARTING_BUTTON_lEFT_RIGHT, 580, BUTTON_WIDTH, BUTTON_HEIGHT);
+    	playButton.setAction("selectLevel", this.getClass(),this);
+		addMyButton(playButton,false);
+	    
+		add(changePlayer);
+	    add(prompt);
+	    add(playerName2);
+	    setVisible(true);
+	    
+	    //Saving the string?
+		String nameOfPlayer1 = playerName1.getText();
+	    System.out.print(nameOfPlayer1);
+		
+	    this.addMouseListener(playButton);
+	    playerName2.addActionListener(this);
+	    //setSize(300, 170);
+	   // return contentPane;
+	    return null;
+	}
+	
+	
+	public JPanel selectLevel(){
+// Background image is called "selectLevel.png" 
+		this.removeAllButtons();
+		this.removeAll();
+		this.backgroundImage = backgroundImageSelectLevel;		
+	
+		//image is called "dummy.png" 
+/*				
+		ImageIcon dummy = new ImageIcon("dummy.png");
+		dummyButton = new MyJButton(dummy);
+		//The size of the icons
+		dummyButton.setAction("start", MainFrame.thisFrame.getClass(),MainFrame.thisFrame);
+		dummyButton.setBounds(190,250, 600, 150);
+	    addMyButton(dummyButton,false);
+
+	    //image is called "easy.png"
+		ImageIcon easy = new ImageIcon("easy.png");
+		easyButton = new MyJButton(easy);
+		easyButton.setBounds(190,400, 600, 150);
+		easyButton.setAction("start", MainFrame.thisFrame.getClass(),MainFrame.thisFrame);
+		addMyButton(easyButton,false);
+		
+		//image is called "moderate.png"
+		ImageIcon moderate = new ImageIcon("moderate.png");
+		moderateButton = new MyJButton(moderate);
+		moderateButton.setBounds(190,550, 600, 150);
+		moderateButton.setAction("start", MainFrame.thisFrame.getClass(),MainFrame.thisFrame);
+		addMyButton(moderateButton,false);
+		
+		//image is called "perfect.png"
+		ImageIcon perfect = new ImageIcon("perfect.png");
+		perfectButton = new MyJButton(perfect);
+		perfectButton.setBounds(190,700, 600, 150);
+		perfectButton.setAction("start", MainFrame.thisFrame.getClass(),MainFrame.thisFrame);
+		addMyButton(perfectButton,false);
+			
+		dummyButton.addActionListener(this);
+		easyButton.addActionListener(this);
+		moderateButton.addActionListener(this);
+		perfectButton.addActionListener(this);
+	*/	
+		dummyButton = new MyJButton("images/dummy.png", 190,250, 600, 150);
+		dummyButton.setAction("dummy", this.getClass(),this);
+		addMyButton(dummyButton,false);
+		this.addMouseListener(dummyButton);//IMPORTANT
+		
+		easyButton = new MyJButton("images/easy.png", 190,400, 600, 150);
+		easyButton.setAction("easy", this.getClass(),this);
+		addMyButton(easyButton,false);
+		this.addMouseListener(easyButton);//IMPORTANT
+		
+		moderateButton = new MyJButton("images/moderate.png", 190,550, 600, 150);
+		moderateButton.setAction("moderate", this.getClass(),this);
+		addMyButton(moderateButton,false);
+		this.addMouseListener(moderateButton);//IMPORTANT
+		
+		perfectButton = new MyJButton("images/perfect.png", 190,700, 600, 150);
+		perfectButton.setAction("perfect", this.getClass(),this);
+		addMyButton(perfectButton,false);
+		this.addMouseListener(perfectButton);//IMPORTANT
+		
+		return null;
+	}
+	
+
+	
+//functions below is for when we decide on making the level difficulties
+	
+	public void dummy(){
+		//removeAll();
+		//MainFrame.thisFrame.sideMenu();
+		MainFrame.thisFrame.start();
+		
+	}
+
+	public void easy(){
+		MainFrame.thisFrame.start();
+	}
+
+	
+	public void moderate(){
+		MainFrame.thisFrame.start();
+	}
+	
+	public void perfect(){
+		MainFrame.thisFrame.start();
+	}
+	
+	
+	
+	
+	/**
+	 * This will switch the panel by using the command of the method name of the new panel
+	 * This is slightly advance and isnt normally used.
+	 * a different way to do it is to instead use a switch statement and have each method in there
+	 * but it is longer than this and menus can be added at will
+	 * @param command
+	 */
+	public void switchPanel(String command)
+	{
+		Method m=null;
+		try
+		{
+			m=this.getClass().getMethod(command);
+		} catch (SecurityException e)
+		{
+			e.printStackTrace();
+		} catch (NoSuchMethodException e)
+		{
+			e.printStackTrace();
+		}
+		JPanel ret=null;
+		try
+		{
+			ret=(JPanel) m.invoke(this, null);
+		} catch (IllegalArgumentException e)
+		{
+			e.printStackTrace();
+		} catch (IllegalAccessException e)
+		{
+			e.printStackTrace();
+		} catch (InvocationTargetException e)
+		{
+			e.printStackTrace();
+		}
+		if(ret!=null)
+		{
+			switchPanel(ret);
+		}
+	}
+	/**
+	 * This switches the panel
+	 * @param ret
+	 */
+	public void switchPanel(JPanel ret)
+	{
+		if(ret!=null)
+		{
+			MainFrame.thisFrame.switchPanel(ret,this);
+			this.setCurrentPanel(ret);
+		}
+	}
+	// Don't need the function below
+	public void actionPerformed(ActionEvent event){
+	//actions for button
+		if(event.getSource() instanceof MyJButton){	
+			MyJButton clickedButton = (MyJButton) event.getSource();
+			String buttonText = clickedButton.getText();
+			String command=event.getActionCommand();
+			if(buttonText.equals("START")){
+				
+				//blah blah
+			}else
+			{
+			//	switchPanel(command);
+			}
+			
+			JPanel p=null;
+			if(buttonText.equals("New Game")){ 
+				System.out.println("new game!!");
+				//Display option screen
+				this.remove(startButton);
+				p=optionMenu();
+			}
+			
+			if(buttonText.equals("instructions")){ 
+				//Display Instructions Screen with Back Button
+				p=instructions();
+			}
+			
+			if(buttonText.equals("player")){ 
+			//Display the 2 X 3 player option with text field
+				numberOfPlayers = 2;
+				p=playerOption1();
+				
+				//Nested if's because this option will start game
+				if(buttonText.equals("girlButton")){
+					//call the 6 player function every time?
+					playerOption = 1;
+					p=player1();
+					//Displays Player 2 with text field
+					
+					
+				}
+				
+				if(buttonText.equals("womanButton")){ 
+					playerOption = 2;
+					p=player1();
+					
+				}
+				
+				if(buttonText.equals("grandmaButton")){ 
+					playerOption = 3;
+					p=player1();
+				}
+				
+				if(buttonText.equals("boyButton")){ 
+					playerOption = 4;
+					p=player1();
+				}
+				
+				if(buttonText.equals("menButton")){ 
+					playerOption = 5;
+					p=player1();
+				}
+				
+				if(buttonText.equals("grandpaButton")){ 
+					playerOption = 6;
+					p=player1();
+				}
+			}
+			
+			if(buttonText.equals("computer")){ 
+				//Display the 2 X 3 player option with text field
+				numberOfPlayers = 1;
+				playerOption2();
+				
+				if(buttonText.equals("girlButton")){
+					//call the 6 player function every time?
+					//Displays Player 2 with text field
+					playerOption = 1;
+					p=player1();
+				}
+				
+				if(buttonText.equals("womanButton")){ 
+					playerOption = 2;
+					p=player1();
+				}
+				
+				if(buttonText.equals("grandmaButton")){ 
+					playerOption = 3;
+					p=player1();
+				}
+				
+				if(buttonText.equals("boyButton")){ 
+					playerOption = 4;
+					p=player1();
+				}
+				
+				if(buttonText.equals("menButton")){ 
+					playerOption = 5;
+					p=player1();
+				}
+				
+				if(buttonText.equals("grandpaButton")){ 
+					playerOption = 6;
+					p=player1();
+				}
+			}
+			
+			if(buttonText.equals("highScore")){ 
+				//Displays HighScore page with back button
+				p=highScore();
+			}
+			
+			
+			if(buttonText.equals("back")){ 
+				//Displays options menu
+				p=optionMenu();
+			}
+			
+			//Don't need play button
+			if(buttonText.equals("Play")){ 
+				//Starts Game
+				p=selectLevel();
+				if(buttonText.equals("dummy")){ 
+					//starts Game
+
+					MainFrame.thisFrame.start();
+				}
+				else if(buttonText.equals("easy")){ 
+					//starts Game
+					MainFrame.thisFrame.start();
+				}
+				else if(buttonText.equals("moderate")){ 
+					//starts Game
+					MainFrame.thisFrame.start();
+				}
+				else if(buttonText.equals("hardButton")){ 
+					//starts Game
+					MainFrame.thisFrame.start();
+				}
+			}			
+			
+			if(buttonText.equals("Next")){ 
+				//Will go to player 2 screen 
+				p=player2();
+				//setTitle("Name is " + playerName1.getText());
+				//System.out.print("next");
+				
+			}
+			switchPanel(p);
+		}
+	}
+	public JPanel getCurrentPanel()
+	{
+		return currentPanel;
+	}
+	public void setCurrentPanel(JPanel currentPanel)
+	{
+		this.currentPanel = currentPanel;
+	}
+	public void paint(Graphics g)
+	{
+		//background here!!!!
+		if(backgroundImage != null)
+		{
+		//	System.out.println(backgroundImage);
+			g.drawImage(backgroundImage, 0, 0, this);
+		}
+
+		//foreground below
+		super.paintComponents(g);
+		super.paint(g);
+	}
+}
+
+
+

@@ -1,0 +1,296 @@
+package GUI;
+
+import gameplay.GameEngine;
+
+import java.awt.DisplayMode;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+
+public class MainFrame extends JFrame implements ActionListener
+{
+	boolean started = true;
+	public static MainFrame thisFrame;
+	private Display d;
+	Menu m;
+	Rectangle bounds;
+	Rectangle fullBounds;
+	double scaleX,scaleY;
+	boolean updated;
+	boolean fullScreen=false;
+	public GameEngine i;
+	/**
+	 * Create the frame.
+	 */
+	public MainFrame()
+	{
+		try
+		{
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+
+		thisFrame=this;
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//	setBounds(100, 100, 1000, 1000);
+		
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		JMenu mnFile = new JMenu("File");
+		menuBar.add(mnFile);
+		
+		JMenuItem mntmSave = new JMenuItem("New Game");
+		mntmSave.addActionListener(this);
+		//adding this as an action listener means that if an action happens
+		//this will handle it
+		mnFile.add(mntmSave);
+		mnFile.addSeparator();
+		
+/*		JMenuItem mntmLoad = new JMenuItem("Change Size");
+		
+		mntmLoad.addActionListener(this);
+		mnFile.add(mntmLoad);
+*/
+
+		JMenuItem mntmQuit = new JMenuItem("Quit");
+		mntmQuit.addActionListener(this);
+		mnFile.add(mntmQuit);
+
+		/*
+		JMenu mnOptions = new JMenu("Options");
+		menuBar.add(mnOptions);	
+		*/
+		
+		JMenu mnDebug = new JMenu("Debug");
+		menuBar.add(mnDebug);
+		
+		JMenuItem mntmAI = new JMenuItem("AI MOVE");
+		mntmAI.addActionListener(this);
+		mnDebug.add(mntmAI);
+		
+		JMenuItem mntmUndo = new JMenuItem("UNDO MOVE");
+		mntmUndo.addActionListener(this);
+		mnDebug.add(mntmUndo);
+		
+		init();
+		setDisplay(new Display(scaleX,scaleY));
+		if(started)
+		{
+			
+			addMenu();
+			
+<<<<<<< .mine
+			this.addMouseListener(d.getGrid());
+			this.addKeyListener(d.getGrid());
+			add(d);
+//			addMenu();
+=======
+			//this.addMouseListener(d.getGrid());
+			//this.addKeyListener(d.getGrid());
+			//add(d);
+>>>>>>> .r115
+		}else
+		{
+			addMenu();
+		}
+	}
+
+	public void init()
+	{
+		bounds=new Rectangle(0,0,1280,1024);
+		if(fullScreen)
+		{
+			ScreenManager screen = new ScreenManager();
+			DisplayMode displaymode = screen.findFirstCompatibleMode(ScreenModes.transfer(ScreenModes.ALL_MODES));
+			screen.setFullScreen(displaymode, this);
+		}else
+		{
+			setSize(1100,900);
+			this.setResizable(false);
+		}
+		fullBounds=new Rectangle(this.getBounds());
+		System.out.println("fullbounds are: "+fullBounds);
+		System.out.println("reg bounds are: "+bounds);
+		scaleX=fullBounds.getWidth()/bounds.getWidth();
+		scaleY=fullBounds.getHeight()/bounds.getHeight();
+		System.out.println("scae x "+scaleX+" scae y "+scaleY);
+	}
+	/**
+	 * If a menu item is clicked and it has this class as an actionListener
+	 * then this method is called
+	 * command for a JMenuItem is the name of the JMenuItem
+	 */
+	@Override
+	public void actionPerformed(ActionEvent arg0)
+	{
+		String command=arg0.getActionCommand();
+		if(command.equals("AI MOVE"))
+		{
+			GameEngine.makeAiMove();
+		}
+		if(command.equals("UNDO MOVE"))
+		{
+			GameEngine.undoMove();
+		}
+		
+		if(command.equals("New Game"))
+		{
+			addMenu();
+		/*	
+			MainFrame frame = new MainFrame();
+			frame.setSize (1000, 1000);
+			frame.setLocation (0, 0);  
+			
+			m = new Menu();
+			frame.add(m);
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			
+		}
+		*/
+		}
+
+		if(command.equalsIgnoreCase("Quit"))
+		{
+			System.exit(0);
+		}
+
+		
+		System.out.println("ACTIONED");
+		//System.out.println(arg0.getActionCommand());
+		
+	}
+
+
+	public void start()
+	{
+		i.start();
+		//if(started)
+		//{
+		int player1 = 0;
+		int player2 = 0;
+		int numberOfPlayers = 0;
+		String name1 = "";
+		String name2 = "";
+		
+		if(m != null){
+			player1 = m.getValues1();
+			player2 = m.getValues2();
+			name1 = m.getName1();
+			name2 = m.getName2();
+			
+			System.out.println("m.getName1() " + name1);
+			System.out.println("m.getName2() " + name2);
+			numberOfPlayers = m.setPlayerValues();
+			
+			remove(m);
+		}
+	//	remove(m);
+		if(getDisplay() != null){
+			remove(getDisplay());
+		}else
+		{
+			setDisplay(new Display(scaleX,scaleY));
+			this.addMouseListener(getDisplay().getGrid());
+			this.addKeyListener(getDisplay().getGrid());
+		}
+		getDisplay().setNumberOfPlayers(numberOfPlayers);
+		System.out.println("# of players " + numberOfPlayers);
+		if(numberOfPlayers == 1){
+			getDisplay().setValues1(player1);
+			getDisplay().setName1(name1);
+			System.out.println("Case 1");
+			System.out.println("name " + name1);
+			System.out.println("player 1 " + player1);
+		}
+		else if (numberOfPlayers == 2){
+			getDisplay().setValues1(player1);
+			getDisplay().setName1(name1);
+			getDisplay().setValues2(player2);
+			getDisplay().setName2(name2);
+			System.out.println("Case 2");
+			System.out.println("name1 " + name1);
+			System.out.println("setValues1 " + player1);
+			System.out.println("name2 " + name2);
+			System.out.println("setValues2 " + player2);
+		}
+		else if (numberOfPlayers == 3){
+			getDisplay().setName1(name1);
+			getDisplay().setName2(name2);
+			System.out.println("Case 3");
+			System.out.println("name " + name1);
+			System.out.println("name " + name2);
+		}
+
+
+		
+		add(getDisplay());
+			//started=true;
+		//}
+	}
+	//I didn't use the addMenu() function
+	public void addMenu()
+	{
+		if(getDisplay()!=null)
+		{
+			remove(getDisplay());
+		}
+		if(m!=null)
+		{
+			remove(m);
+		}
+		if(started)
+		{
+			//this.removeAll();
+			m = new Menu(scaleX,scaleY,this.getWidth(),this.getHeight());
+			add(m);
+			started=false;
+			this.validate();
+		}
+	}
+	
+	public void switchPanel(JPanel ret,Menu m)
+	{
+		if(ret!=null)
+		{
+			System.out.println("Switching panel");
+//			if(m.getCurrentPanel()!=null)
+//			this.remove(m.getCurrentPanel());
+//			this.add(ret);
+			this.setContentPane(ret);
+	//		m.setCurrentPanel(ret);
+		}
+	}
+
+	public void updated()
+	{
+		updated=true;
+		if(getDisplay()!=null)
+		{
+			getDisplay().updated();
+		}
+	}
+
+	public void setGame(GameEngine gameEngine) {
+		// TODO Auto-generated method stub
+		i=gameEngine;
+	}
+
+	public Display getDisplay() {
+		return d;
+	}
+
+	public void setDisplay(Display d) {
+		this.d = d;
+	}
+}

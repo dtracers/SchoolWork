@@ -1,0 +1,879 @@
+package brains;
+
+import gameplay.GridStorage;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+public class MinMaxTreeNode
+{
+	static int width;//find somewhere to set these
+	static int height;
+	int[][] board;
+	MinMaxTree tree;//this will just be an object of the calling tree
+	TurnedMove bestMove;
+	TurnedMove currentMove;
+	ArrayList<MinMaxTreeNode> nextLevel;//its leafs
+	MinMaxTreeNode parent;//its parent
+//	MinMaxTreeNode HighestParent;//this is the previous parent that is after the last actual move
+	public static final int LARGE_THRESHHOLD=100;//a number
+	public static final int SMALL_THRESHHOLD=-100;//a number
+	boolean leaf=false;
+	public MinMaxTreeNode(TurnedMove m, MinMaxTreeNode minMaxTreeNode, MinMaxTree tree2)
+	{
+//		System.out.println("Creating tree with Move "+m);
+		currentMove=m;
+		parent=minMaxTreeNode;
+		tree=tree2;
+//		HighestParent=highestParent2;
+	}
+	//IF THE THREATS ARE COMPUTED IT NEEDS TO CHANGE WHAT IT WILL RETURN AS FAR AS NEXT MOVES
+	//SAME THING IF IT EVALUATES A WINNING MOVE
+	public Move evaluate(GridStorage g, int playersTurn, int level)//based on the turn and ai thing it will either return a positive or negative value
+	{
+//		System.out.println("Evaluating "+currentMove);
+		board=g.getGridObject();
+		g.setPiece(currentMove);
+		int won=g.gameWonMove(currentMove);
+		int rows=board.length;
+		int cols=board[0].length;
+		int posX=currentMove.getX();
+		int posY=currentMove.getY();
+		int sum_right=0;
+		int sum_left=0;
+		int sum_diag_right=0;
+		int sum_diag_left=0;
+		int sum_down=0;
+		currentMove.scoreValue+=4*board[0].length-4*Math.abs((currentMove.getX()-board[0].length/2));
+		if(won!=0)
+		{
+			//do we need to look for anything else?
+			currentMove.scoreValue+=100*(int)Math.signum(won);
+			
+		}
+		else
+		{
+			
+			//we need to do more evaluation!
+			//Check for side threats
+			for(int i=1; i<4; i++){
+				//adds 25pts to a potential threat(each enemy piece together)
+				//horizontal right
+				if(posX+i<cols)
+					if(board[posY][posX] != board[posY][posX+i] 
+							&& board[posY][posX+i]!=0)
+						sum_right+=1;
+					else
+						break;
+			}
+			
+			for(int i=1; i<4; i++){				
+				//horizontal left
+				if(posX-i>0)
+					if(board[posY][posX] != board[posY][posX-i]
+							&& board[posY][posX-i]!=0)
+						sum_left+=1;
+					else
+						break;
+			}
+			
+			for(int i=1; i<4; i++){
+				//vertical down
+				if(posY+i<rows)
+					if(board[posY][posX] != board[posY+i][posX]
+							&& board[posY+i][posX]!=0)
+						sum_down+=1;
+					else
+						break;
+			}
+			for(int i=1; i<4; i++){
+				//diagnal right
+				if(posY+i<rows && posX+i<cols)
+					if(board[posY][posX] != board[posY+i][posX+i]
+							&& board[posY+i][posX+i]!=0)
+						sum_diag_right+=1;
+					else
+						break;
+			}
+			
+			for(int i=1; i<4; i++){
+				//diagnol left
+				if(posY-i>0 && posX+i<cols)
+					if(board[posY][posX] != board[posY-i][posX+i]
+							&& board[posY-i][posX+i]!=0)
+						sum_diag_left+=1;
+					else
+						break;
+			}
+			
+			currentMove.scoreValue += 25*(sum_right+sum_left+sum_diag_right+sum_diag_left+sum_down);
+			//equlizing the signum 100 function
+			if(currentMove.scoreValue>=100)
+				currentMove.scoreValue=80;
+					
+		}
+		this.addPossibleMoves(board, playersTurn, level,g);
+		//add next level of moves here
+		g.undoMove(currentMove);//undoes the move to set the grid back to normal
+		bestMove=currentMove;
+		//System.out.println("Score is "+currentMove.scoreValue);
+		if(currentMove.scoreValue>0)
+		{
+	//		System.out.println("oh good a better move "+currentMove.scoreValue);
+		}
+		return currentMove;
+	}
+	/**
+	 * removes all nodes except that current one
+	 * @param node
+	 */
+	/*
+	public void removeAllExcept(MinMaxTreeNode node)
+	{
+		for(int k=0;k<LevelLength;k++)
+		{
+			MinMaxTreeNode nextNode=nextLevel[k];
+			if(nextNode!=null&&node!=nextNode)
+			{
+				nextLevel[k]=null;//removes it
+			}
+		}
+	}
+	*/
+	/**
+	 * This largest value is returned
+	 * if it is above a certain value it is cut
+	 * @return
+	 */
+	public TurnedMove LargestCut(LinkedList<MinMaxTreeNode> lowest)
+	{
+		if(nextLevel==null)
+		{
+			if(!leaf)
+			{
+				lowest.add(this);
+			}
+			return currentMove;
+		}
+		ArrayList<TurnedMove> moves=new ArrayList<TurnedMove>();
+		int winningmoves=0;
+		for(int k=0;k<nextLevel.size();k++)
+		{
+			MinMaxTreeNode node=nextLevel.get(k);
+			if(node!=null)
+			{
+				if(false &&node.bestMove!=null && node.bestMove.scoreValue>LARGE_THRESHHOLD)//that means its a winning move!
+				{
+					node.removeAll();
+					node.leaf=true;
+					k--;
+				}else
+				{
+					TurnedMove nodesMove=node.SmallestCut(lowest);//goes down the tree
+					if(bestMove!=null)
+					{
+						moves.add(nodesMove);
+					}
+				}
+			}
+		}
+		int largestIndex=-1;
+		int maxValue=-200;//this means a lost btw
+		for(int k=0;k<moves.size();k++)
+		{
+			TurnedMove m=moves.get(k);
+			if(m.scoreValue>maxValue)
+			{
+				maxValue=m.scoreValue;
+				largestIndex=k;
+			}
+		}
+		if(largestIndex==-1)
+			return currentMove;
+		return moves.get(largestIndex);
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	 * same thing as large cut
+	 * @return
+	 */
+	public TurnedMove SmallestCut(LinkedList<MinMaxTreeNode> lowest)
+	{
+		if(nextLevel==null)
+		{
+			if(!leaf)
+			{
+				lowest.add(this);
+			}
+			return currentMove;
+		}
+		ArrayList<TurnedMove> moves=new ArrayList<TurnedMove>();
+		for(int k=0;k<nextLevel.size();k++)
+		{
+			MinMaxTreeNode node=nextLevel.get(k);
+			if(node!=null)
+			{
+				if(false &&node.bestMove!=null&&node.bestMove.scoreValue>LARGE_THRESHHOLD)
+				{
+	//				node.removeAll();
+					node.removeAll();
+					node.leaf=true;
+					k--;
+				}else
+				{
+					TurnedMove nodesMove=node.LargestCut(lowest);
+					if(bestMove!=null)
+					{
+						moves.add(nodesMove);
+					}
+				}
+			}
+		}
+		int smallestIndex=-1;
+		int minValue=0;//this means a win btw
+		for(int k=0;k<moves.size();k++)
+		{
+			TurnedMove m=moves.get(k);
+			if(m.scoreValue>minValue||k==0)
+			{
+				minValue=m.scoreValue;
+				smallestIndex=k;
+			}
+		}
+		if(smallestIndex==-1)
+			return currentMove;
+		return moves.get(smallestIndex);
+	}
+	
+	//if level is even look for max value
+	//if level is odd look for min value
+	public TurnedMove alphaCut(LinkedList<MinMaxTreeNode> lowest,int level,int depthToTravel,boolean firstLevel)
+	{
+		//if it is the bottom level
+		if(nextLevel==null)
+		{
+			if(!leaf && currentMove.scoreValue>-100 && currentMove.scoreValue<100)
+			{
+				lowest.add(this);
+			}else if(!leaf)
+			{
+				nextLevel=null;
+				//this is either a winning move or a losing move don't ever have to care about score value
+				leaf=true;
+			}
+			this.bestMove=currentMove;
+			return currentMove;
+		}
+		
+		int value=0;
+		if(parent!=null)
+			value = parent.bestMove.scoreValue;
+		
+		MinMaxTreeNode best=null;
+		for(int k=0;k<nextLevel.size();k++)
+		{
+			MinMaxTreeNode next=nextLevel.get(k);
+			
+			TurnedMove ret=next.alphaCut(lowest,level+1,depthToTravel,false);
+			int score=ret.scoreValue;
+			if(score!=0)
+			{
+		//		System.out.println("Im a non zero score "+score+"my level is "+level);
+			}
+			//accept true if move is better than another one already
+			boolean accept=false;
+			if(level%2==0)
+			{
+				accept=score>value;
+			}else
+			{
+				accept=score<value;
+			}
+			if(k==0||accept)
+			{
+			//	System.out.println("better score! "+score);
+				//its a better move
+				value=score;
+				best=next;
+				this.bestMove = best.bestMove;
+			}else
+			{
+				return this.bestMove;
+			}
+		}
+		if(level>=depthToTravel)
+		{
+			return currentMove;
+		}
+		if(best==null)
+			return currentMove;
+		if(firstLevel)
+		{
+			System.out.println("my best move is "+best.bestMove);
+			bestMove=best.currentMove;
+			return bestMove;
+		}else
+		{
+			bestMove=best.bestMove;
+			return bestMove;
+		}
+	}
+	
+	private void removeAll()
+	{
+		nextLevel=null;//cuts off further trees
+		board=null;
+	}
+	
+	/**
+	 * update this method!
+	 * @param currentLevel
+	 * @param grid
+	 * @param turn
+	 * @param turnlevel
+	 */
+	public void addPossibleMoves(LinkedList<MinMaxTreeNode> currentLevel,int[][] grid,int turn,int turnlevel)
+	{
+		ArrayList<MinMaxTreeNode> moves=new ArrayList<MinMaxTreeNode>();//size wont exceed [grid.length*2+1];
+		int height=grid.length;
+		int width=grid[0].length;
+		for(int k=0;k<width;k++)
+		{
+			if(grid[0][k]==0)//if there is a move possibility at the top
+			{
+		//		System.out.println("Creating a place piece move!");
+				TurnedMove m=new TurnedMove(k,0,turn,turnlevel);
+				m.setPlayerPiece(turn);
+				MinMaxTreeNode n=new MinMaxTreeNode(m,this,tree);
+				moves.add(n);
+				currentLevel.add(n);
+			}
+			if(grid[height-1][k]==turn)	//if the bottom piece is the same as whose turn it is!
+			{
+				
+//				System.out.println("Creating a remove piece option!");
+		//		System.out.println("Creating a remove piece move!");
+				TurnedMove m=new TurnedMove(k,grid.length-1,-2,turnlevel);
+				m.setPlayerPiece(turn);
+				MinMaxTreeNode n=new MinMaxTreeNode(m,this,tree);
+				moves.add(n);//remove pieces
+				currentLevel.add(n);
+			}else
+			{
+	//			System.out.println("Not a remove piece "+grid[height-1][k]+" turn "+turn+"this piece "+currentMove);
+			}
+		}
+		if(parent==null||parent.currentMove.getPiece()!=-1)//if the previous move was a grid flip
+		{
+		//	System.out.println("Creating a flip board");
+			TurnedMove m=new TurnedMove(0,0,-1,turnlevel);
+			m.setPlayerPiece(turn);
+			MinMaxTreeNode n=new MinMaxTreeNode(m,this,tree);
+			moves.add(n);//flipping the grid
+			currentLevel.add(n);
+		}
+		nextLevel=moves;
+		//it will add all possibly moves to the end of this queue
+	}
+	
+	
+	public void addPossibleMoves(int[][] grid,int turn,int turnlevel,GridStorage g)
+	{
+		ArrayList<MinMaxTreeNode> moves=new ArrayList<MinMaxTreeNode>();//size wont exceed [grid.length*2+1];
+		int height=grid.length;
+		int width=grid[0].length;
+		for(int k=0;k<width;k++)
+		{
+			if(grid[0][k]==0)//if there is a move possibility at the top
+			{
+		//		System.out.println("Creating a place piece move!");
+				TurnedMove m=new TurnedMove(k,0,turn,turnlevel);
+				m.setPlayerPiece(turn);
+				MinMaxTreeNode n=new MinMaxTreeNode(m,this,tree);
+				moves.add(n);
+			}
+			if(grid[height-1][k]==turn)	//if the bottom piece is the same as whose turn it is!
+			{
+//				System.out.println("the height is "+height);
+//				System.out.println("Creating a remove piece option!");
+		//		System.out.println("Creating a remove piece move!");
+//				System.out.println("current turn is "+currentMove.getPlayerPiece()+" new turn is "+turn);
+				TurnedMove m=new TurnedMove(k,grid.length-1,-2,turnlevel);
+				m.setPlayerPiece(turn);
+				MinMaxTreeNode n=new MinMaxTreeNode(m,this,tree);
+				moves.add(n);//remove pieces
+			}else
+			{
+	//			System.out.println("Not a remove piece "+grid[height-1][k]+" turn "+turn+"this piece "+currentMove);
+			}
+		}
+		if((parent==null||parent.currentMove==null||parent.currentMove.getPiece()!=-1)&&g.numberOfPieceOnBoard()>2&&turnlevel>2)//if the previous move was a grid flip
+		{
+		//	System.out.println("I AM FLIPPING A BOARD");
+		//	System.out.println("Creating a flip board");
+			TurnedMove m=new TurnedMove(0,0,-1,turnlevel);
+			m.setPlayerPiece(turn);
+			MinMaxTreeNode n=new MinMaxTreeNode(m,this,tree);
+			moves.add(n);//flipping the grid
+		}
+		nextLevel=moves;
+		//it will add all possibly moves to the end of this queue
+	}
+	
+	/**
+	 * this will addALl the moves at the current Points
+	 * @param currentLevel
+	 * @param grid
+	 * @param turn
+	 * @param turnlevel
+	 */
+	public void addAll(LinkedList<MinMaxTreeNode> currentLevel,int[][] grid,int turn,int turnlevel)
+	{
+		if(nextLevel!=null)
+		{
+			for(MinMaxTreeNode name:nextLevel) 
+			{
+				name.addAll(currentLevel,grid,turn,turnlevel);
+			}
+		}else
+		{
+			this.addPossibleMoves(currentLevel,grid,turn,turnlevel);
+		}
+		/*
+		{011011010110000101110010011010010110000101101110011011100110000100100000011011000110111101110110011001010111001100100000011110010110111101110101}
+			
+		}
+		*/
+	}
+	/**
+	 * Assumes the incoming tree nodes moves has already been removed
+	 * if the parent actually is different then the node needs to be removed
+	 * goes up tree till a common parent which will be at most number of difference in levels
+	 * This is where the problem is!
+	 * @param previous
+	 * @param g
+	 */
+	public void ParentMove(MinMaxTreeNode previous,GridStorage g)
+	{
+		//means this is one of the first moves
+		if(previous==null||this.parent==previous.parent)
+		{
+			return;
+		}else
+		{
+			if(parent!=null&&previous.parent!=null)
+			{
+				g.undoMove(previous.parent.currentMove);//before going up remove
+				parent.ParentMove(previous.parent,g);//going up
+				g.setPiece(parent.currentMove);
+			}
+		}
+	}
+	
+	/**
+	 * This will undo moves while the parent is not Node
+	 * @param start
+	 * @param node
+	 * @param g
+	 */
+	public void undoMoves(MinMaxTreeNode start,MinMaxTreeNode node,GridStorage g)
+	{
+		if(parent!=node&&parent!=null)
+		{
+			if(start!=this)
+				g.undoMove(currentMove);
+			parent.undoMoves(start,node,g);
+		}else if(parent==node&&parent!=null&&start!=this)
+		{
+			g.undoMove(currentMove);
+		}
+	}
+	
+	/**
+	 * This will do the moves while the parent is not Node
+	 * @param start
+	 * @param node
+	 * @param g
+	 */
+	public void doMoves(MinMaxTreeNode start,MinMaxTreeNode node,GridStorage g)
+	{
+		if(parent!=node&&parent!=null)
+		{
+			parent.doMoves(start,node,g);
+			if(start!=this)
+				g.setPiece(currentMove);
+		}else if(parent==node&&parent!=null&&start!=this)
+		{
+			g.setPiece(currentMove);
+		}
+	}
+	/**
+	 * METHODS CALLED FOR EVALUATION!!!
+	 */
+
+
+	/**
+	 * This will start at the last move looking for new possible threats that could occur
+	 * @return
+	 */
+	public void computeThreats(Move m)
+	{
+		if(m.getPiece()>0)
+		{
+			ArrayList<Move> threats=new ArrayList<Move>();
+			Row[]rows=getNextRow(m.getPiece(),m);
+			for(Row r:rows)
+			{
+				if(r.numberInRow==3)
+				{
+					Move lb=r.LBPossible;
+					Move rt=r.TRPossible;
+					if(lb!=null)
+					{
+						threats.add(lb);
+					}
+					if(rt!=null)
+					{
+						threats.add(rt);
+						
+					}
+				}
+			}
+			if(threats.size()>0)
+			{
+				currentMove.scoreValue+=25*threats.size();//if it gives two sets of winning moves it is considered a really good one!
+				//but maybe not the best move as it can lead to a flip board
+	//			System.out.println("Computed threats are "+threats);
+			}
+		}
+	}
+	/**
+	 * This will take the next possible row and compute it
+	 * @return
+	 */
+	public Row[] getNextRow(int pieceType,Move m)
+	{
+	//	System.out.println("Looking for the next threat at "+m.getX()+" "+m.getY());
+		Row[] rows=new Row[4];
+		for(int k=0;k<rows.length;k++)
+		{
+			int direction=k+1;
+			Row temp=new Row(direction,pieceType);
+//			System.out.println("Direction "+direction);
+			getNextRowLB(m.getX(),m.getY(),temp);
+//			System.out.println("finished rowing");
+//			System.out.println(temp);
+//			System.out.println("next");
+			rows[k]=temp;
+		}
+		return rows;
+	}
+	/**
+	 * This will go to the left and the bottom then it will work its way up the tree
+	 * 
+	 * TODO:  remove 1
+	 * @param x
+	 * @param y
+	 * @param r
+	 * @param numberInRow
+	 * @return
+	 */
+	public void getNextRowLB(int x,int y,Row r)
+	{
+		if(r.numberInRow==3)
+		{
+	//		System.out.println("THREES COMPANAY");
+		}
+		r.setMove(x, y, r.numberInRow+1);
+	//	System.out.println("Getting next Row at X: "+x+" Y: "+y);
+		r.numberInRow++;
+		int newX=-1,newY=-1;
+		//going down the recursion chain can only go left and down
+		boolean quit=false;
+		switch(r.direction)
+		{
+			case 1://top left
+				if(x-1<0||y-1<0)
+					if(r.numberInRow!=1)
+						return;
+					else
+						quit=true;
+				newX=x-1;
+				newY=y-1;
+				break;
+			case 2://left
+				if(x-1<0)
+					return;
+				newX=x-1;
+				newY=y;
+				break;
+			case 3://bottom left
+				if(x-1<0||y+1>=height)
+					if(r.numberInRow!=1)
+						return;
+					else
+						quit=true;
+				newX=x-1;
+				newY=y+1;
+				break;
+			case 4://bottom
+				if(y+1>=height)
+					return;
+				newX=x;
+				newY=y+1;
+				break;
+			case 5://bottom right
+				if(x+1>=width||y+1>=height)
+					if(r.numberInRow!=1)
+						return;
+					else
+						quit=true;
+				newX=x+1;
+				newY=y+1;
+				break;
+		}
+		boolean leftMostCase=false;
+		int number=r.numberInRow;//this means that there is at least 1
+		if(!quit)
+		{
+	//		System.out.println("NEW PLACES "+newX+" "+newY);
+			int piece=board[newY][newX];
+	//		System.out.println("Piece is "+piece);
+			if(piece!=r.piecetype&&piece!=0)
+				return;
+			if(piece==0)
+			{
+	//			System.out.println("SETTING THREAT");
+				r.LBPossible=new Move(newX,newY);
+				if(r.numberInRow!=1)
+				{
+					return;
+				}else
+					 leftMostCase=true;
+			}
+			
+			//GowDown
+	//		System.out.println("Going down! "+newX+" "+newY);
+			if(!leftMostCase)
+				getNextRowLB(newX,newY,r);
+	//		System.out.println("Done Gooing Down");
+			//going up
+		}else
+		{
+	//		System.out.println("QUIT after first time");
+	//		System.out.println("Go other way");
+		}
+		if(number!=r.numberInRow)//added only the third one
+		{
+			//Pieces were added
+			if(number==1)//only one was added so far the first one
+			{
+				//then it is middle
+				if(number+1==r.numberInRow)
+				{
+					//WORKS
+					//we need to move the second one over one and this one over one two
+					r.setMove(r.getMove(2),3);
+					r.setMove(r.getMove(1),2);
+					r.setMove(null, 1);//makes it null
+				}else
+				{
+					//WORKS
+					getNextRowRT(x,y,r);
+					//it is full be happy
+					return;
+				}
+			}
+			else
+			{
+				return;//only zero can go the other way
+			}
+		}else
+		{
+			if(number>1)//if it isnt the first one return
+				return;			
+			//put the first one in the last spot
+			r.setMove(r.getMove(1), 3);//put the last move on the first one because it is going rt now
+			r.setMove(null, 1);
+	//		System.out.println();
+	//		System.out.println("IT is the first one");
+		}
+		//going up now
+		if(r.numberInRow<=3)
+		{
+			//if it is less than three it is not full
+			getNextRowRT(x,y,r);
+		}
+		return;
+	}
+	/**
+	 * 
+	 * This goes up the row to finish adding the threat
+	 * it is already in the row so you do not add it at the beginning
+	 */
+	public void getNextRowRT(int x,int y,Row r)
+	{
+//		System.out.println("going up X:"+x+" Y:"+y+"\n"+r);
+		int newX=-1,newY=-1;
+		
+		switch(r.direction)
+		{
+			case 1://top left - needs to go bottom right
+				if(x+1>=width||y+1>=height)
+					return;
+				newX=x+1;
+				newY=y+1;
+				break;
+			case 2://left - needs to go right
+				if(x+1>=width)
+					return;
+				newX=x+1;
+				newY=y;
+				break;
+			case 3://bottom left - needs to go top right
+				if(x+1>=width||y-1<0)
+					return;
+				newX=x+1;
+				newY=y-1;
+				break;
+			case 4://bottom - need to go top
+				if(y-1<0)
+					return;
+				newX=x;
+				newY=y-1;
+				break;
+			case 5://bottom right - needs to go top left
+				if(x-1<0||y-1<0)
+					return;
+				newX=x-1;
+				newY=y-1;
+				break;
+		}
+//		System.out.println("Up move is valid");
+		int piece=board[newY][newX];
+		if(piece!=r.piecetype&&piece!=0)
+			return;
+		if(piece==0)
+		{
+//			System.out.println("SETTING THREAT");
+			r.TRPossible=new Move(newX,newY);
+			return;
+		}
+		if(r.numberInRow<3)
+		{
+			r.setMove(newX, newY, 3-r.numberInRow);
+			r.numberInRow++;
+		}else
+		{
+			r.TRPossible=new Move(newX,newY);
+		}
+		//everything is ordered correctly so just go up
+		if(r.numberInRow<=3)
+		{
+			getNextRowRT(newX,newY,r);
+		}
+	}
+	/*
+	 * just converts it
+	 */
+	private int[] lb(int direction,int x,int y)
+	{
+		int newX=-1,newY=-1;
+		int[] hold=new int[2];
+		hold[0]=-1;
+		hold[1]=-1;
+		switch(direction)
+		{
+			case 1://top left
+				if(x-1<0||y-1<0)
+					return hold;
+				newX=x-1;
+				newY=y-1;
+				break;
+			case 2://left
+				if(x-1<0)
+					return hold;
+				newX=x-1;
+				newY=y;
+				break;
+			case 3://bottom left
+				if(x-1<0||y+1>=height)
+					return hold;
+				newX=x-1;
+				newY=y+1;
+				break;
+			case 4://bottom
+				if(y+1>=height)
+					return hold;
+				newX=x;
+				newY=y+1;
+				break;
+			case 5://bottom right
+				if(x+1>=width||y+1>=height)
+					return hold;
+				newX=x+1;
+				newY=y+1;
+				break;
+		}
+		hold[0]=newX;
+		hold[1]=newY;
+		return hold;
+	}
+	private int[] rt(int direction,int x,int y)
+	{
+		int newX=-1,newY=-1;
+		int[] hold=new int[2];
+		hold[0]=-1;
+		hold[1]=-1;
+		
+		switch(direction)
+		{
+			case 1://top left - needs to go bottom right
+				if(x+1>=width||y+1>=height)
+					return hold;
+				newX=x+1;
+				newY=y+1;
+				break;
+			case 2://left - needs to go right
+				if(x+1>=width)
+					return hold;
+				newX=x+1;
+				newY=y;
+				break;
+			case 3://bottom left - needs to go top right
+				if(x+1>=width||y-1<0)
+					return hold;
+				newX=x+1;
+				newY=y-1;
+				break;
+			case 4://bottom - need to go top
+				if(y-1<0)
+					return hold;
+				newX=x;
+				newY=y-1;
+				break;
+			case 5://bottom right - needs to go top left
+				if(x-1<0||y-1<0)
+					return hold;
+				newX=x-1;
+				newY=y-1;
+				break;
+		}
+		
+		hold[0]=newX;
+		hold[1]=newY;
+		return hold;
+	}
+	public void addMoves(LinkedList<MinMaxTreeNode> moves)
+	{
+		if(nextLevel!=null)
+		{
+			moves.addAll(nextLevel);
+		}
+	}
+}

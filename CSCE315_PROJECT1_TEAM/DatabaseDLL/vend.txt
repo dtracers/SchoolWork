@@ -1,0 +1,4 @@
+Walmart, Electronics, 1876/03/13, 112987530953
+Starbucks, Coffee, 2000/05/15, STR334
+Target, General, 1966/11/14, TR45T
+Test, Test, 1966/12/30, TEST294

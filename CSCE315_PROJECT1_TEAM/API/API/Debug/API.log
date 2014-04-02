@@ -1,0 +1,31 @@
+﻿Build started 2/3/2012 10:20:31 AM.
+     1>Project "H:\CSCE315\GroupAssignment1\API\API\API.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Debug\API.unsuccessfulbuild".
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D API_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\Date.cpp ..\..\Time.cpp Column.cpp Column.cpp Creating_table_parser.cpp Database.cpp Expression_handler.cpp Table.cpp main.cpp parser.cpp
+         parser.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'parser.cpp': No such file or directory
+         main.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'main.cpp': No such file or directory
+         Table.cpp
+     1>h:\csce315\groupassignment1\api\api\table.h(1): fatal error C1083: Cannot open include file: 'Column.cpp': No such file or directory
+         Expression_handler.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'Expression_handler.cpp': No such file or directory
+         Database.cpp
+     1>h:\csce315\groupassignment1\api\api\table.h(1): fatal error C1083: Cannot open include file: 'Column.cpp': No such file or directory
+         Creating_table_parser.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'Creating_table_parser.cpp': No such file or directory
+         Column.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'Column.cpp': No such file or directory
+         Column.cpp
+     1>c1xx : fatal error C1083: Cannot open source file: 'Column.cpp': No such file or directory
+         Generating Code...
+         Skipping... (no relevant changes detected)
+         Time.cpp
+         Date.cpp
+     1>Done Building Project "H:\CSCE315\GroupAssignment1\API\API\API.vcxproj" (build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:01.32
