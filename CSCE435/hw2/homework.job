@@ -1,0 +1,38 @@
+#PBS -l nodes=1:ppn=8,walltime=0:02:00,mem=100mb
+#PBS -N homework
+#PBS -S /bin/bash
+#PBS -j oe
+    
+module load intel/compilers
+cd $PBS_O_WORKDIR
+
+icc -o list_minimum.exe list_minimum.c –lpthread -lc
+
+./list_minimum.exe  1
+./list_minimum.exe  2
+./list_minimum.exe  4
+./list_minimum.exe  8
+./list_minimum.exe  16
+./list_minimum.exe  32
+./list_minimum.exe  64
+./list_minimum.exe  128
+./list_minimum.exe  256
+./list_minimum.exe  512
+./list_minimum.exe  1024
+./list_minimum.exe  2048
+./list_minimum.exe  4096
+./list_minimum.exe  8192
+
+icc -o barrier.exe barrier.c –lpthread -lc
+./barrier.exe 1
+./barrier.exe 2
+./barrier.exe 4
+./barrier.exe 8
+./barrier.exe 16
+./barrier.exe 32
+./barrier.exe 64
+./barrier.exe 128
+./barrier.exe 256
+./barrier.exe 512
+./barrier.exe 1024
+

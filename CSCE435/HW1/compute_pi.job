@@ -1,0 +1,10 @@
+#PBS -l nodes=1:ppn=8,walltime=0:10:00,mem=100mb
+#PBS -N compute_pi
+#PBS -S /bin/bash
+#PBS -j oe
+    
+module load intel/compilers
+cd $PBS_O_WORKDIR
+
+./compute_pi.exe 1000000000 1
+

@@ -1,0 +1,26 @@
+#PBS -l nodes=1:n=8,walltime=0:05:00,mem=100mb
+#PBS -N homework
+#PBS -S /bin/bash
+#PBS -j oe
+    
+module load intel/compilers
+cd $PBS_O_WORKDIR
+
+icc -o prefix_sum.exe prefix_sum.c -lpthread -lc
+
+./prefix_sum.exe 1000000 1
+./prefix_sum.exe 1000000 2
+./prefix_sum.exe 1000000 4
+./prefix_sum.exe 1000000 8
+./prefix_sum.exe 1000000 16
+./prefix_sum.exe 1000000 32
+./prefix_sum.exe 1000000 64
+./prefix_sum.exe 1000000 128
+./prefix_sum.exe 1000000 256
+./prefix_sum.exe 1000000 512
+./prefix_sum.exe 1000000 1024
+./prefix_sum.exe 1000000 2048
+./prefix_sum.exe 1000000 4096
+./prefix_sum.exe 1000000 8192
+
+931801.login006.sc.cluster.tamu
